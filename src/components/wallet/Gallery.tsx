@@ -134,7 +134,7 @@ const Gallery = () => {
     return (
         <div>
             <Head>
-                <title>Your NFTs, select an image to fractionalize</title>
+                <title>Your NFTs, select an image to a PUT option</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Box overflow="hidden" bg="purple.100" minH="100vh">
@@ -147,7 +147,7 @@ const Gallery = () => {
                         textDecoration="underline"
                         fontSize={["4xl", "4xl", "5xl", "5xl"]}
                     >
-                        Your NFTs, select an image to fractionalize or Bid on
+                        Your NFTs, select an image to buy a PUT option for
                     </Text>
                     {/* <form onSubmit={handleSubmit}>
                         <InputGroup pb="1rem">
@@ -176,7 +176,7 @@ const Gallery = () => {
                 <Tabs>
                     <TabList>
                         <Tab>Your NFTs</Tab>
-                        <Tab>NFTs to bid on</Tab>
+                        <Tab>Sell a PUT option</Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>

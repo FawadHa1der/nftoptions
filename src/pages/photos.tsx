@@ -1,7 +1,7 @@
-import { FractionalizeForm } from "components/wallet";
+import { PutOptionForm } from "components/wallet";
 import { NFTData } from "components/wallet/NFTData";
 import { useState } from "react";
-import { IFractionalize } from "components/wallet/FractionalizeForm";
+import { IPutOption } from "components/wallet/PutOptionForm";
 import React, { useEffect } from "react";
 
 import {
@@ -93,7 +93,7 @@ export default function Photos(props: PhotoProps) {
   const ricksDBAddress = '0x03a1ad875dd9e9cbacb3a02ba6b7d3089bf9181c3f0a5da5753963828f416e59';
 
   const router = useRouter();
-  const [data, setData] = useState<IFractionalize>();
+  const [data, setData] = useState<IPutOption>();
   const [pic, setPic] = useState<NFTData>();
 
   const [stkAddress, setStkAddress] = useState<string>();
@@ -107,7 +107,7 @@ export default function Photos(props: PhotoProps) {
 
   const toast = useToast();
 
-  async function onRegistered(fractionData: IFractionalize) {
+  async function onRegistered(fractionData: IPutOption) {
 
     setData(fractionData);
     console.log('fractionData  ', fractionData)
@@ -236,25 +236,8 @@ export default function Photos(props: PhotoProps) {
         </Box>
       </Center>
 
-      <FractionalizeForm onRegistered={onRegistered} nftdata={pic} />
-
-      <Text
-        letterSpacing="wide"
-        textDecoration="underline"
-        as="h3"
-        fontWeight="semibold"
-        fontSize="l"
-      >
-        <Divider my="1rem" />
-
-        Staking Pool Address {stkAddress}
-        <Divider my="1rem" />
-
-        Ricks Address {ricksAddress}
-      </Text>
-
+      <PutOptionForm onRegistered={onRegistered} nftdata={pic} />
     </Box >
-
   );
 }
 
