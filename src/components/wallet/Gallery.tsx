@@ -177,6 +177,8 @@ const Gallery = () => {
                     <TabList>
                         <Tab>Your NFTs</Tab>
                         <Tab>Sell a PUT option</Tab>
+                        <Tab>Active PUTS</Tab>
+                        <Tab>Expired PUTS</Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>
@@ -206,8 +208,15 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p>two!</p>
+                            <p></p>
                         </TabPanel>
+                        <TabPanel>
+                            <p></p>
+                        </TabPanel>
+                        <TabPanel>
+                            <p></p>
+                        </TabPanel>
+
                     </TabPanels>
                 </Tabs>
                 <Flex my="1rem" justify="center" align="center" direction="column">

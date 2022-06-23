@@ -23,13 +23,23 @@ from starkware.cairo.common.uint256 import (
 from openzeppelin.token.erc721.library import ERC721_approve, ERC721_transferFrom
 from openzeppelin.introspection.ERC165 import ERC165_supports_interface, ERC165_register_interface
 from starkware.cairo.common.bool import TRUE, FALSE
+from openzeppelin.token.ERC20.interfaces.IERC20 import IERC20
+from openzeppelin.token.erc721.interfaces.IERC721 import IERC721
+
+from starkware.starknet.common.syscalls import (
+    get_block_number,
+    get_block_timestamp,
+    get_contract_address,
+)
 
 struct ERC721PUT:
     member strike_price : Uint256
     member expiry_date : felt
     member erc721_address : felt
     member erc721_id : Uint256
-    member premium : felt
+    member premium : Uint256
+    member buyer_address : felt
+    member seller_address : felt
 end
 
 @view
@@ -49,31 +59,123 @@ func supportsInterface{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
 end
 
 @storage_var
-func open_puts(i : felt) -> (res : ERC721PUT):
+func bids(bid_id : felt) -> (res : ERC721PUT):
+end
+
+@view
+func view_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(bid_id : felt) -> (
+    bid : ERC721PUT
+):
+    let _bid : ERC721PUT = bids.read(bid_id)
+    return (bid=_bid)
 end
 
 @storage_var
-func open_puts_count() -> (count : felt):
+func bids_count() -> (count : felt):
+end
+
+@view
+func view_bids_count{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    bids_count : felt
+):
+    let _bids_count : felt = bids_count.read()
+    return (bids_count=_bids_count)
 end
 
 @storage_var
-func active_puts(i : felt) -> (res : ERC721PUT):
+func puts(put_id : felt) -> (res : ERC721PUT):
 end
 
 @storage_var
-func active_puts_count() -> (count : felt):
+func puts_count() -> (count : felt):
+end
+
+@storage_var
+func premium_token_address() -> (address : felt):
+end
+
+@constructor
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    _premium_token_address : felt
+):
+    premium_token_address.write(_premium_token_address)
+    return ()
 end
 
 @external
-func register_buy_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-    put : ERC721PUT
-) -> (put_id : felt):
-    return (0)  # need to update later on
+func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    bid : ERC721PUT
+) -> (bid_id : felt):
+    let current_index : felt = bids_count.read()
+    let new_index : felt = current_index + 1
+
+    # struct ERC721PUT:
+    #     member strike_price : Uint256
+    #     member expiry_date : felt
+    #     member erc721_address : felt
+    #     member erc721_id : Uint256
+    #     member premium : Uint256
+    # end
+
+    # transfer the premium
+    let _premium_token_address : felt = premium_token_address.read()
+    let _erc721_token_address : felt = bid.erc721_address
+    let _erc721_token_id : Uint256 = bid.erc721_id
+
+    let caller_address : felt = get_caller_address()
+    let option_contract_address : felt = get_contract_address()
+    let option_premium : Uint256 = bid.premium
+
+    IERC20.transferFrom(
+        contract_address=_premium_token_address,
+        sender=caller_address,
+        recipient=option_contract_address,
+        amount=option_premium,
+    )
+
+    IERC721.transferFrom(
+        contract_address=_erc721_token_address,
+        from_=caller_address,
+        to=option_contract_address,
+        tokenId=_erc721_token_id,
+    )
+    bid.buyer_address = caller_address
+    bids.write(new_index, bid)
+    bids_count.write(new_index)
+    return (bid_id=new_index)
 end
 
 @external
-func register_sell_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-    put_id : felt
-) -> (active_id : felt):
-    return (TRUE)
+func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    bid_id : felt
+) -> (success : felt):
+    let bid : ERC721PUT = bids.read(bid_id)
+    # let current_put_index : felt = puts_count.read()
+    # let new_put_index: felt = current_put_index + 1
+    let caller_address : felt = get_caller_address()
+    let option_contract_address : felt = get_contract_address()
+
+    let _premium_token_address : felt = premium_token_address.read()
+    let option_premium : Uint256 = bid.premium
+    let strike_price : Uint256 = bid.strike_price
+
+    IERC20.transferFrom(
+        contract_address=_premium_token_address,
+        sender=caller_address,
+        recipient=option_contract_address,
+        amount=strike_price,
+    )
+
+    IERC20.transferFrom(
+        contract_address=_premium_token_address,
+        sender=option_contract_address,
+        recipient=caller_address,
+        amount=option_premium,
+    )
+
+    bid.seller_address = caller_address
+
+    bids.write(bid_id, bid)
+    puts.write(bid_id, bid)
+    return (success=TRUE)  # true or false
 end
