@@ -7,13 +7,12 @@ import asyncio
 from starkware.starknet.testing.starknet import Starknet
 from starkware.starknet.compiler.compile import compile_starknet_files
 from utils import (
-    Signer, MockSigner, str_to_felt, MAX_UINT256, get_contract_def, cached_contract,
-    TRUE, assert_revert, to_uint, sub_uint, add_uint
+    Signer, uint, to_uint, add_uint, sub_uint, str_to_felt, MAX_UINT256, ZERO_ADDRESS, INVALID_UINT256,
+    TRUE, get_contract_def, cached_contract, assert_revert, assert_event_emitted, contract_path
 )
 CONTRACT_FILE = os.path.join("contracts", "erc721_option.cairo")
-ERC20_FILE = os.path.join("contracts", "erc721_option.cairo")
 
-signer = Signer(123456789987654321)
+signer = Signer(123456789)
 
 # random token IDs
 TOKENS = [
@@ -43,19 +42,19 @@ def get_oz_lib_def(path):
 @pytest.fixture(scope='module')
 def contract_defs():
     # account_def = get_contract_def('./openzeppelin/account/Account.cairo')
-    account_def = get_oz_lib_def('account/Account.cairo')
-    erc20_def = get_oz_lib_def(
-        'token/erc20/ERC20.cairo')
+    account_def = get_contract_def('openzeppelin/account/Account.cairo')
+    erc20_def = get_contract_def(
+        'openzeppelin/token/erc20/ERC20.cairo')
     erc721Option_def = get_contract_def(
-        CONTRACT_FILE)
-    erc721_def = get_oz_lib_def(
-        'token/erc721/ERC721_Mintable_Burnable.cairo')
+        'erc721_option.cairo')
+    erc721_def = get_contract_def(
+        'openzeppelin/token/erc721/ERC721_Mintable_Burnable.cairo')
 
     return account_def, erc20_def, erc721_def, erc721Option_def
 
 
 RECIPIENT = 123
-INIT_SUPPLY = to_uint(10000000)
+INIT_SUPPLY = to_uint(100000000)
 AMOUNT = to_uint(200)
 UINT_ONE = to_uint(1)
 UINT_ZERO = to_uint(0)
@@ -75,6 +74,7 @@ async def erc721_init(contract_defs):
         contract_class=account_def,
         constructor_calldata=[signer.public_key]
     )
+
     erc20 = await starknet.deploy(
         contract_class=erc20_def,
         constructor_calldata=[
@@ -85,6 +85,11 @@ async def erc721_init(contract_defs):
             account1.contract_address,        # recipient
         ]
     )
+    # await signer.send_transaction(
+    #     account1, erc20.contract_address, 'transfer', [
+    #         account2.contract_address,
+    #         *to_uint(40000)
+    #     ])
     erc721 = await starknet.deploy(
         contract_class=erc721_def,
         constructor_calldata=[
@@ -121,25 +126,43 @@ def erc721_factory(contract_defs, erc721_init):
     erc20 = cached_contract(_state, erc20_def, erc20)
     erc721Option = cached_contract(_state, erc721Option_def, erc721Option)
 
-    return erc721, account1, account2, erc721, erc20, erc721Option
+    return account1, account2, erc721, erc20, erc721Option
 
 
 @pytest.fixture(scope='module')
 async def erc721_minted(erc721_factory):
-    erc721, account1, account2, erc721, erc20, erc721Option = erc721_factory
+    account1, account2, erc721, erc20, erc721Option = erc721_factory
     # mint tokens to account
     for token in TOKENS:
         await signer.send_transaction(
             account1, erc721.contract_address, 'mint', [
                 account1.contract_address, *token]
         )
+        await signer.send_transaction(
+            account1, erc721.contract_address, 'approve', [
+                erc721Option.contract_address, *token]
+        )
 
-    signer.send_transaction(
+    # return_bool = await signer.send_transaction(account1, erc20Weth.contract_address, 'approve', [ricks.contract_address, *bid_256])
+
+    await signer.send_transaction(
+        account1, erc20.contract_address, 'approve', [
+            erc721Option.contract_address,
+            *to_uint(10000000)
+        ])
+
+    await signer.send_transaction(
+        account2, erc20.contract_address, 'approve', [
+            erc721Option.contract_address,
+            *to_uint(10000000)
+        ])
+
+    await signer.send_transaction(
         account1, erc20.contract_address, 'transfer', [
             account2.contract_address,
-            *add_uint(40000, UINT_ONE)
+            *to_uint(400000)
         ])
-    return erc721, account1, account2, erc721, erc20, erc721Option
+    return account1, account2, erc721, erc20, erc721Option
 
 # struct ERC721PUT:
 #     member strike_price : Uint256
@@ -152,10 +175,10 @@ async def erc721_minted(erc721_factory):
 # end
 
 EXPIRY_DATE = 5436543875684343534
-BID = to_uint(10000)
-PREMIUM = to_uint(5000)
-NULL_BUYERS_ADDRESS = to_uint(0)
-NULL_SELLERS_ADDRESS = to_uint(0)
+BID = uint(10000)
+PREMIUM = uint(5000)
+NULL_BUYERS_ADDRESS = 734597439539
+NULL_SELLERS_ADDRESS = 4758947594379
 
 
 @pytest.fixture(scope="module")
@@ -167,21 +190,45 @@ def event_loop():
 
 @pytest.mark.asyncio
 async def test_open_bid(erc721_minted):
-    erc721, account1, account2, erc721, erc20, erc721Option = erc721_minted
-    signer.send_transaction(
+    account1, account2, erc721, erc20, erc721Option = erc721_minted
+    
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
+
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
+
+    tx_exec_info = await signer.send_transaction(
         account1, erc721Option.contract_address, 'register_put_bid', [
-            BID,
-            *EXPIRY_DATE,
+            *BID,
+            EXPIRY_DATE,
             erc721.contract_address,
             *(TOKENS[0]),
             *PREMIUM,
-            *NULL_BUYERS_ADDRESS,
-            *NULL_BUYERS_ADDRESS
+            NULL_BUYERS_ADDRESS,
+            NULL_SELLERS_ADDRESS
         ])
+    assert tx_exec_info.result.response == [0]
+ 
+    execution_info1 = await erc721Option.view_bids_count().call()
+    assert execution_info1.result.bids_count == 1
 
-    execution_info1 = await erc721Option.view_bid_count().call()
-    assert execution_info1.result.count == 1
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    assert initialAccount1Balance - PREMIUM[0]  == execution_info.result.balance[0]
 
+    execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
+    assert PREMIUM[0]  == execution_info.result.balance[0]
+
+    tx_exec_info = await signer.send_transaction(
+        account2, erc721Option.contract_address, 'register_put_sell', [
+        tx_exec_info.result.response[0]])
+    assert tx_exec_info.result.response == [1]
+
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    assert initialAccount2Balance - BID[0] + PREMIUM[0] == execution_info.result.balance[0]
+
+    execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
+    assert BID[0] == execution_info.result.balance[0]
     # await assert_revert(signer.send_transaction(
     #     account, erc20.contract_address, 'transfer', [
     #         RECIPIENT,
@@ -189,7 +236,6 @@ async def test_open_bid(erc721_minted):
     #     ]),
     #     reverted_with="ERC20: transfer amount exceeds balance"
     # )
-
 
 # #
 # # supportsInterface

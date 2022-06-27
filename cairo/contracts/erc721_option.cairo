@@ -106,16 +106,9 @@ end
 func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     bid : ERC721PUT
 ) -> (bid_id : felt):
+    alloc_locals
     let current_index : felt = bids_count.read()
     let new_index : felt = current_index + 1
-
-    # struct ERC721PUT:
-    #     member strike_price : Uint256
-    #     member expiry_date : felt
-    #     member erc721_address : felt
-    #     member erc721_id : Uint256
-    #     member premium : Uint256
-    # end
 
     # transfer the premium
     let _premium_token_address : felt = premium_token_address.read()
@@ -139,10 +132,20 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
         to=option_contract_address,
         tokenId=_erc721_token_id,
     )
-    bid.buyer_address = caller_address
-    bids.write(new_index, bid)
+
+    let bid_to_write : ERC721PUT = ERC721PUT(
+        strike_price=bid.strike_price,
+        expiry_date=bid.expiry_date,
+        erc721_address=bid.erc721_address,
+        erc721_id=bid.erc721_id,
+        premium=bid.premium,
+        buyer_address=caller_address,
+        seller_address=0,
+    )
+
+    bids.write(current_index, bid_to_write)
     bids_count.write(new_index)
-    return (bid_id=new_index)
+    return (bid_id=current_index)
 end
 
 @external
@@ -150,8 +153,6 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     bid_id : felt
 ) -> (success : felt):
     let bid : ERC721PUT = bids.read(bid_id)
-    # let current_put_index : felt = puts_count.read()
-    # let new_put_index: felt = current_put_index + 1
     let caller_address : felt = get_caller_address()
     let option_contract_address : felt = get_contract_address()
 
@@ -159,6 +160,7 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     let option_premium : Uint256 = bid.premium
     let strike_price : Uint256 = bid.strike_price
 
+    # transfer the bid into the contract
     IERC20.transferFrom(
         contract_address=_premium_token_address,
         sender=caller_address,
@@ -166,16 +168,24 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
         amount=strike_price,
     )
 
-    IERC20.transferFrom(
+    #transfer the premium from the contract to the seller 
+    IERC20.transfer(
         contract_address=_premium_token_address,
-        sender=option_contract_address,
         recipient=caller_address,
-        amount=option_premium,
+        amount=option_premium
     )
 
-    bid.seller_address = caller_address
+    let bid_to_write : ERC721PUT = ERC721PUT(
+        strike_price=bid.strike_price,
+        expiry_date=bid.expiry_date,
+        erc721_address=bid.erc721_address,
+        erc721_id=bid.erc721_id,
+        premium=bid.premium,
+        buyer_address=bid.buyer_address,
+        seller_address=caller_address,
+    )
 
-    bids.write(bid_id, bid)
-    puts.write(bid_id, bid)
+    bids.write(bid_id, bid_to_write)
+    # puts.write(bid_id, bid)
     return (success=TRUE)  # true or false
 end

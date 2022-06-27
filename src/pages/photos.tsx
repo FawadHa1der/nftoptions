@@ -93,9 +93,7 @@ function parseInputAmountToUint256(input: string, decimals = 18) {
 
 
 export default function Photos(props: PhotoProps) {
-  const rewardToken = '0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10';
-  const ricksDBAddress = '0x03a1ad875dd9e9cbacb3a02ba6b7d3089bf9181c3f0a5da5753963828f416e59';
-  const optionsAddress = '0x0052dbf12d99fd19e4f3f703ca97e0b0096a5b04a89c246a2fd3804355a006e5';
+  const optionsAddress = '0x03fe6c71c40715a542cae5f2fb65381753f089f63f4d5dbc3df5239b93dfb07a';
 
   const router = useRouter();
   const [data, setData] = useState<IPutOption>();

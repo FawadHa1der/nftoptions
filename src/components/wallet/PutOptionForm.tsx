@@ -2,7 +2,6 @@
 import { useForm } from "react-hook-form";
 import React from "react";
 import { FormErrorMessage, FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
-import { DatePicker } from "react-datepicker";
 import { number } from "starknet";
 import { useRouter } from "next/router";
 import { NFTData } from "./NFTData";
