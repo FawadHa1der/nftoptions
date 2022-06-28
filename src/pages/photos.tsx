@@ -41,6 +41,7 @@ import {
   CompiledContract
 } from "starknet";
 import { sendTransaction } from "utils/blockchain/starknet";
+import { callContract, createContract } from "utils/blockchain/starknet";
 
 // import ricksompiledcontract from "../compiledcairo/RICKS.json";
 // import stakingpoolcompiledcontract from "../compiledcairo/StakingPool.json";
@@ -49,12 +50,8 @@ import { sendTransaction } from "utils/blockchain/starknet";
 
 export async function getStaticProps() {
   const compiledDirectory = path.join(process.cwd(), 'src/compiledcairo');
-  const fullStakingPath = path.join(compiledDirectory, "StakingPool.json");
-
-  const fullRicksPath = path.join(compiledDirectory, "ricks.json");
   const fullOptionsPath = path.join(compiledDirectory, "erc721_option.json");
 
-  const fullDBPath = path.join(compiledDirectory, "ricksdb.json");
   const erc721Path = path.join(compiledDirectory, "erc721.json");
   const erc20Path = path.join(compiledDirectory, "erc20.json");
 
@@ -62,11 +59,8 @@ export async function getStaticProps() {
 
   return {
     props: {
-      stakingpool: fs.readFileSync(fullStakingPath).toString("ascii"),
-      ricks: fs.readFileSync(fullRicksPath).toString("ascii"),
       erc721: fs.readFileSync(erc721Path).toString("ascii"),
       erc20: fs.readFileSync(erc20Path).toString("ascii"),
-      ricksDB: fs.readFileSync(fullDBPath).toString("ascii"),
       nftOptions: fs.readFileSync(fullOptionsPath).toString("ascii")
     }
   };
@@ -93,14 +87,12 @@ function parseInputAmountToUint256(input: string, decimals = 18) {
 
 
 export default function Photos(props: PhotoProps) {
-  const optionsAddress = '0x03fe6c71c40715a542cae5f2fb65381753f089f63f4d5dbc3df5239b93dfb07a';
+  const optionsAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
+  const erc20Address = '0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10'; // argentx test token
 
   const router = useRouter();
   const [data, setData] = useState<IPutOption>();
   const [pic, setPic] = useState<NFTData>();
-
-  const [stkAddress, setStkAddress] = useState<string>();
-  const [ricksAddress, setRicksAddress] = useState<string>();
 
   useEffect(() => {
     if (!!router.query.data)
@@ -114,7 +106,7 @@ export default function Photos(props: PhotoProps) {
 
     setData(optionData);
     console.log('fractionData  ', optionData)
-    toast({ description: 'This might take 3-10 mins deploying to goerli test net' })
+    toast({ description: 'This might take a bit' })
 
     /*struct ERC721PUT:
         member strike_price : Uint256
@@ -122,25 +114,37 @@ export default function Photos(props: PhotoProps) {
         member erc721_address : felt
         member erc721_id : Uint256
         member premium : Uint256
-        member buyer_address : felt
-        member seller_address : felt
     end
-    10 fields in the transaction
+    8 fields in the transaction
      */
 
     const low_strike_price = optionData.strike_price
     const high_strike_price = '0'
     const expiry_date = '7598437954379574398'
-    const erc721_address = pic?.contract_address
-    const erc721_id_low = pic?.token_id
+    const erc721_address = pic?.contract_address ? pic?.contract_address : ''
+    const erc721_id_low = pic?.token_id ? pic?.token_id : ''
     const erc721_id_high = '0'
     const premium_low = optionData.premium
     const premium_high = '0'
     // const buyer_address = ''
-    const myStruct = { a: low_strike_price, b: high_strike_price, c: expiry_date, d: erc721_address, e: erc721_id_low, f: erc721_id_high, g: premium_low, h: premium_high, i: '0', j: '0' }
+    const myStruct = { a: low_strike_price, b: high_strike_price, c: expiry_date, d: erc721_address, e: erc721_id_low, f: erc721_id_high, g: premium_low, h: premium_high }
 
-    const nftOptions = new Contract(json.parse(props.nftOptions).abi, optionsAddress);
-    let transaction_response = await sendTransaction(nftOptions, 'register_put_bid', myStruct)
+    const nftOptionsContractInstance = new Contract(json.parse(props.nftOptions).abi, optionsAddress);
+    const erc20ContractInstance = new Contract(json.parse(props.erc20).abi, erc20Address);
+    const erc721ContractInstance = new Contract(json.parse(props.erc721).abi, erc721_address);
+
+    let transaction_response = await sendTransaction(erc721ContractInstance, 'approve', { to: optionsAddress, tokenIdLow: erc721_id_low, tokenIdHigh: 0 })
+    console.log(`Waiting for erc721 approve Tx ${transaction_response.transaction_hash} to be Accepted `);
+    await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash);
+
+    toast({ description: 'Giving approval to ricks for the reward token', duration: Infinity });
+    transaction_response = await sendTransaction(erc20ContractInstance, 'approve', { spender: optionsAddress, amountLow: '1000000000', amountHigh: '0' })
+    console.log(`Waiting for erc20 approve Tx ${transaction_response.transaction_hash} to be Accepted `);
+    await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash);
+
+    transaction_response = await sendTransaction(nftOptionsContractInstance, 'register_put_bid', myStruct)
+    console.log(`Waiting for register_put_bid Tx ${transaction_response.transaction_hash} to be Accepted `);
+    await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash);
   }
 
   return (

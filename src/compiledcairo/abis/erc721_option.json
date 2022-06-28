@@ -19,6 +19,38 @@
     {
         "members": [
             {
+                "name": "params",
+                "offset": 0,
+                "type": "ERC721PUT_PARAM"
+            },
+            {
+                "name": "buyer_address",
+                "offset": 8,
+                "type": "felt"
+            },
+            {
+                "name": "seller_address",
+                "offset": 9,
+                "type": "felt"
+            },
+            {
+                "name": "status",
+                "offset": 10,
+                "type": "felt"
+            },
+            {
+                "name": "bid_id",
+                "offset": 11,
+                "type": "felt"
+            }
+        ],
+        "name": "ERC721PUT",
+        "size": 12,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
                 "name": "strike_price",
                 "offset": 0,
                 "type": "Uint256"
@@ -42,20 +74,10 @@
                 "name": "premium",
                 "offset": 6,
                 "type": "Uint256"
-            },
-            {
-                "name": "buyer_address",
-                "offset": 8,
-                "type": "felt"
-            },
-            {
-                "name": "seller_address",
-                "offset": 9,
-                "type": "felt"
             }
         ],
-        "name": "ERC721PUT",
-        "size": 10,
+        "name": "ERC721PUT_PARAM",
+        "size": 8,
         "type": "struct"
     },
     {
@@ -209,7 +231,7 @@
         "inputs": [
             {
                 "name": "bid",
-                "type": "ERC721PUT"
+                "type": "ERC721PUT_PARAM"
             }
         ],
         "name": "register_put_bid",
@@ -224,11 +246,43 @@
     {
         "inputs": [
             {
-                "name": "bid_id",
+                "name": "bid_id_",
+                "type": "felt"
+            }
+        ],
+        "name": "cancel_put_bid",
+        "outputs": [
+            {
+                "name": "success",
+                "type": "felt"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "bid_id_",
                 "type": "felt"
             }
         ],
         "name": "register_put_sell",
+        "outputs": [
+            {
+                "name": "success",
+                "type": "felt"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "bid_id_",
+                "type": "felt"
+            }
+        ],
+        "name": "exercise_put",
         "outputs": [
             {
                 "name": "success",

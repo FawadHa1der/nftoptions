@@ -24,7 +24,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 //import { useStarknet } from "@starknet-react/core";
 import { useRouter } from "next/router";
-import { NFTData } from "./NFTData";
+import { NFTData, PutData } from "./NFTData";
 import { getStarknet } from "get-starknet";
 
 import {
@@ -44,17 +44,15 @@ import {
 } from "starknet";
 import { BigNumber } from 'bignumber.js'
 
-import ricksdbcompiledcontract from "../../compiledcairo/ricksdb.json";
-import * as ricksompiledcontract from "../../compiledcairo/RICKS.json";
 import erc721compiledcontract from "../../compiledcairo/erc721.json";
-
-//const ricksDBAddress = '0x079880178fd906895816195f820a31bb1842570cbfe5e19ce15275bcb0dde9fe';
-const ricksDBAddress = '0x03a1ad875dd9e9cbacb3a02ba6b7d3089bf9181c3f0a5da5753963828f416e59';
-
+const optionsContractAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
+import optionsCompiledContract from "../../compiledcairo/erc721_option.json";
+import { callContract, createContract } from "utils/blockchain/starknet";
 
 const Gallery = () => {
 
     const [photos, setPhotos] = useState<NFTData[]>();
+    const [openPut, setOpenPut] = useState<PutData[]>();
     const toast = useToast();
     // const [nfts, setNFTS] = useState();
 
@@ -64,39 +62,16 @@ const Gallery = () => {
                 .then(res => res.json())
                 .then(setPhotos)
             console.log(photos);
-            // return () => {
-            //     setQuery({}); // This worked for me
-            //     setPhotos();
-            // };
-        }
 
-        async function getAllRicks() {
-            const ricksDB = new Contract((ricksdbcompiledcontract as CompiledContract).abi, ricksDBAddress);
-            let total_ricks = await ricksDB.call('get_total_ricks')
-            let int_total_ricks = parseInt(total_ricks[0])
-            console.log('total_ricks   xxx ', int_total_ricks, typeof (int_total_ricks))
-            for (let i = 0; i < int_total_ricks; i++) {
-                // console.log('calling')
-                // let ricksdb = await ricksDB.call('get_ricks_address', [i])
-                // let ricksAddress = new BigNumber(ricksdb[0])
-                // console.log('for index', i, 'ricks address is ', ricksAddress.toFixed())
-                // // const { data } = ricksompiledcontract
-                // // /                let parseCompiledContract = json.parse(ricksompiledcontract as string);
+            const optioncontract = createContract(optionsContractAddress, optionsCompiledContract.abi)
+            const view_bids_count = await callContract(optioncontract, 'view_bids_count')
+            const openBids: PutData[] = [];
 
-                // const ricksContract = new Contract((ricksompiledcontract as CompiledContract).abi, ricksAddress.toFixed());
-                // const tokenid = await ricksContract.call('view_token_id')
-                // const bg_token_id = new BigNumber(tokenid[0])
-                // console.log('tokenid is ', bg_token_id)
-
-                // const tokenAddress = await ricksContract.call('view_token_address')
-                // const bgTokenAddress = new BigNumber(tokenAddress[0])
-                // console.log('tokenAddress is ', bgTokenAddress.toFixed())
-
-                // const erc721Contract = new Contract((erc721compiledcontract as CompiledContract).abi, bgTokenAddress.toFixed());
-                // const tokenUri = await erc721Contract.call('tokenURI', [bg_token_id.toFixed(), 0])
-                // const bgTokenuri = new BigNumber(tokenUri[0])
-                // console.log('tokenUri is ', bgTokenuri.toFixed())
-
+            console.log('view_bids_count ' + view_bids_count[0])
+            for (let i = 0; i < view_bids_count[0]; i++) {
+                const bid_result = await callContract(optioncontract, 'view_bid', i.toString())
+                console.log('bid ---> ' + typeof bid_result[0]);
+                console.log('bid ---> ' + JSON.parse(JSON.stringify(bid_result)));
             }
         }
 
@@ -108,7 +83,6 @@ const Gallery = () => {
             else {
                 console.log('connected with ', getStarknet().account.address)
                 getNFTS(getStarknet().account.address);
-                getAllRicks()
             }
         }
         enable()
@@ -124,11 +98,6 @@ const Gallery = () => {
             }
         }
 
-        // if (getStarknet().isConnected === true) {
-
-        // } else {
-        //     // enableArgentX()
-        // }
     }, [getStarknet().isConnected])
 
     return (

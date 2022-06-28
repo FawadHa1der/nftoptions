@@ -35,7 +35,7 @@
 		"ethers": "^5.6.5",
 		"framer-motion": "^4.1.17",
 		"fs": "^0.0.1-security",
-		"get-starknet": "git+https://github.com/FawadHa1der/get-starknet.git/#master",
+		"get-starknet": "^1.4.2",
 		"material-react-toastify": "^1.0.1",
 		"next": "^12.0.7",
 		"next-pwa": "^5.4.4",
@@ -45,7 +45,7 @@
 		"react-dom": "^17.0.2",
 		"react-hook-form": "^7.30.0",
 		"react-icons": "^4.3.1",
-		"starknet": "git+https://github.com/fawadha1der/starknet.js.git#develop",
+		"starknet": "^3.15.0",
 		"use-deep-compare-effect": "^1.8.1",
 		"web3": "^1.7.3"
 	},
