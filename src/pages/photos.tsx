@@ -43,39 +43,38 @@ import {
 import { sendTransaction } from "utils/blockchain/starknet";
 import { callContract, createContract } from "utils/blockchain/starknet";
 
-// import ricksompiledcontract from "../compiledcairo/RICKS.json";
-// import stakingpoolcompiledcontract from "../compiledcairo/StakingPool.json";
-// import erc20compiledcontract from "../compiledcairo/erc20.json";
-// import erc721compiledcontract from "../compiledcairo/erc721.json";
+import erc20compiledcontract from "../compiledcairo/erc20.json";
+import erc721compiledcontract from "../compiledcairo/erc721.json";
+import optionscompiledcontract from "../compiledcairo/erc721_option.json";
 
-export async function getStaticProps() {
-  const compiledDirectory = path.join(process.cwd(), 'src/compiledcairo');
-  const fullOptionsPath = path.join(compiledDirectory, "erc721_option.json");
+// export async function getStaticProps() {
+//   const compiledDirectory = path.join(process.cwd(), 'src/compiledcairo');
+//   const fullOptionsPath = path.join(compiledDirectory, "erc721_option.json");
 
-  const erc721Path = path.join(compiledDirectory, "erc721.json");
-  const erc20Path = path.join(compiledDirectory, "erc20.json");
+//   const erc721Path = path.join(compiledDirectory, "erc721.json");
+//   const erc20Path = path.join(compiledDirectory, "erc20.json");
 
-  //  JSON.parse(JSON.stringify(request.results)); 
+//   //  JSON.parse(JSON.stringify(request.results)); 
 
-  return {
-    props: {
-      erc721: fs.readFileSync(erc721Path).toString("ascii"),
-      erc20: fs.readFileSync(erc20Path).toString("ascii"),
-      nftOptions: fs.readFileSync(fullOptionsPath).toString("ascii")
-    }
-  };
-}
+//   return {
+//     props: {
+//       erc721: fs.readFileSync(erc721Path).toString("ascii"),
+//       erc20: fs.readFileSync(erc20Path).toString("ascii"),
+//       nftOptions: fs.readFileSync(fullOptionsPath).toString("ascii")
+//     }
+//   };
+// }
 
 // import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
 
-interface PhotoProps {
-  stakingpool: any;
-  ricks: any;
-  erc721: any;
-  erc20: any;
-  ricksDB: any;
-  nftOptions: any;
-}
+// interface PhotoProps {
+//   stakingpool: any;
+//   ricks: any;
+//   erc721: any;
+//   erc20: any;
+//   ricksDB: any;
+//   nftOptions: any;
+// }
 
 function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
@@ -86,7 +85,7 @@ function parseInputAmountToUint256(input: string, decimals = 18) {
 }
 
 
-export default function Photos(props: PhotoProps) {
+export default function Photos() {
   const optionsAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
   const erc20Address = '0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10'; // argentx test token
 
@@ -129,9 +128,14 @@ export default function Photos(props: PhotoProps) {
     // const buyer_address = ''
     const myStruct = { a: low_strike_price, b: high_strike_price, c: expiry_date, d: erc721_address, e: erc721_id_low, f: erc721_id_high, g: premium_low, h: premium_high }
 
-    const nftOptionsContractInstance = new Contract(json.parse(props.nftOptions).abi, optionsAddress);
-    const erc20ContractInstance = new Contract(json.parse(props.erc20).abi, erc20Address);
-    const erc721ContractInstance = new Contract(json.parse(props.erc721).abi, erc721_address);
+    const nftOptionsContractInstance = new Contract(optionscompiledcontract.abi as any, optionsAddress);
+    const erc20ContractInstance = new Contract(erc20compiledcontract.abi as any, erc20Address);
+    const erc721ContractInstance = new Contract(erc721compiledcontract.abi as any, erc721_address);
+
+
+    // const nftOptionsContractInstance = new Contract(json.parse(props.nftOptions).abi, optionsAddress);
+    // const erc20ContractInstance = new Contract(json.parse(props.erc20).abi, erc20Address);
+    // const erc721ContractInstance = new Contract(json.parse(props.erc721).abi, erc721_address);
 
     let transaction_response = await sendTransaction(erc721ContractInstance, 'approve', { to: optionsAddress, tokenIdLow: erc721_id_low, tokenIdHigh: 0 })
     console.log(`Waiting for erc721 approve Tx ${transaction_response.transaction_hash} to be Accepted `);
