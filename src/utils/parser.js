@@ -40,6 +40,5 @@ export const parseToUint256 = (value, decimals = DEFAULT_DECIMALS) => {
 
 export const parseFromUint256 = (value, decimals = DEFAULT_DECIMALS) => {
   const bnString = uint256.uint256ToBN(value).toString();
-  return uint256.uint256ToBN(value).toString();
-  //  return parseFromDecimals(bnString, decimals);
+  return parseFromDecimals(bnString, decimals);
 };
