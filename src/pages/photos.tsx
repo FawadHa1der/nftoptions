@@ -152,12 +152,7 @@ export default function Photos() {
   }
 
   return (
-    <Box p="2rem" bg="gray.200" minH="100vh">
-      <Head>
-        <title> Image: {pic?.name}</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
+    <Box p="2rem" minH="80vh" style={{border: "#666666 1px solid", borderRadius: "50px"}}>
       <Flex px="1rem" justify="center" align="center">
         <Text
           letterSpacing="wide"
@@ -167,18 +162,14 @@ export default function Photos() {
           fontSize="xl"
         >
           <AtSignIcon />
-          {pic?.description}
+          {pic?.name}
         </Text>
-        <Spacer />
-        <Box as="a" target="_blank" href={pic?.copy_image_url}>
-          <InfoIcon focusable="true" boxSize="2rem" color="red.500" />{" "}
-        </Box>{" "}
         <Spacer />
         <Link href="/" >
           <Button
             as="a"
             borderRadius="full"
-            colorScheme="pink"
+            colorScheme="cyan"
             fontSize="lg"
             size="lg"
             cursor="pointer"
@@ -188,18 +179,23 @@ export default function Photos() {
         </Link>
       </Flex>
       <Divider my="1rem" />
-
-      <Center>
+      <Flex paddingBottom={30}>
         <Box as="a" target="_blank" href={pic?.copy_image_url}>
           <Image
             src={(!!pic) ? (!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg' : '/vercel.svg'}
             width={300}
             height={300}
+            style={{borderRadius: '5px!important', float: 'left'}}
             loading="eager"
+            alt="nft image"
           />
         </Box>
-      </Center>
-
+        <Box px="1rem" width="50%">
+          <Text fontSize="l" fontWeight="light">
+            {pic?.description ? pic?.description : 'No description'}
+          </Text>
+        </Box>
+      </Flex>
       <PutOptionForm onRegistered={onRegistered} nftdata={pic} />
     </Box >
   );

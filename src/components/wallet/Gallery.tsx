@@ -101,22 +101,20 @@ const Gallery = () => {
     }, [getStarknet().isConnected])
 
     return (
-        <div>
+        <div style={{paddingTop: "1.5vh"}}>
             <Head>
-                <title>Your NFTs, select an image to a PUT option</title>
+                <title>Select an image to purchase a put option</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Box overflow="hidden" bg="purple.100" minH="100vh">
+            <Box overflow="hidden" minH="75vh" rounded="10px" style={{border: "1px black solid", borderRadius: "50px"}}>
                 <Container>
                     <Text
-                        color="pink.800"
                         fontWeight="semibold"
                         mb="1rem"
                         textAlign="center"
-                        textDecoration="underline"
                         fontSize={["4xl", "4xl", "5xl", "5xl"]}
                     >
-                        Your NFTs, select an image to buy a PUT option for
+                        Select an image to buy a put option
                     </Text>
                     {/* <form onSubmit={handleSubmit}>
                         <InputGroup pb="1rem">
@@ -142,7 +140,7 @@ const Gallery = () => {
                     </form> */}
                 </Container>
 
-                <Tabs>
+                <Tabs align="center" variant={"line"}>
                     <TabList>
                         <Tab>Your NFTs</Tab>
                         <Tab>Sell a PUT option</Tab>

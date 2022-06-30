@@ -13,7 +13,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Box p="8" h="full" d="flex" flexDirection="column">
         <Header />
         <Box flex="1 1 auto" as="main" marginY={22}>
-          {children}
+          { children }
         </Box>
         <Footer />
       </Box>
