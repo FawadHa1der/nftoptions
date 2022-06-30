@@ -1,9 +1,9 @@
-import { web3 } from "web3";
-import { starknet } from "starknet"
+import { utils, web3 } from "web3";
+import { number, uint256, starknet } from "starknet"
 
 
-const { number, uint256 } = starknet;
-const { utils } = web3;
+//const { number, uint256 } = starknet;
+//const { utils } = web3;
 
 const TEN = 10;
 const DEFAULT_DECIMALS = 18;
@@ -40,5 +40,6 @@ export const parseToUint256 = (value, decimals = DEFAULT_DECIMALS) => {
 
 export const parseFromUint256 = (value, decimals = DEFAULT_DECIMALS) => {
   const bnString = uint256.uint256ToBN(value).toString();
-  return parseFromDecimals(bnString, decimals);
+  return uint256.uint256ToBN(value).toString();
+  //  return parseFromDecimals(bnString, decimals);
 };

@@ -65,7 +65,7 @@ import optionscompiledcontract from "../compiledcairo/erc721_option.json";
 //   };
 // }
 
-// import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
+import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
 
 // interface PhotoProps {
 //   stakingpool: any;
@@ -131,7 +131,6 @@ export default function Photos() {
     const nftOptionsContractInstance = new Contract(optionscompiledcontract.abi as any, optionsAddress);
     const erc20ContractInstance = new Contract(erc20compiledcontract.abi as any, erc20Address);
     const erc721ContractInstance = new Contract(erc721compiledcontract.abi as any, erc721_address);
-
 
     // const nftOptionsContractInstance = new Contract(json.parse(props.nftOptions).abi, optionsAddress);
     // const erc20ContractInstance = new Contract(json.parse(props.erc20).abi, erc20Address);

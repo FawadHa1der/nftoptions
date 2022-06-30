@@ -25,7 +25,8 @@
     "**/*.ts",
     "**/*.tsx",
     "src",
-    "commitlint.config.js"
+    "commitlint.config.js",
+    "./node_modules/bn.js-typings/index.d.ts"
   ],
   "exclude": [
     "node_modules"
