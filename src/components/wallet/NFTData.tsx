@@ -9,29 +9,6 @@ export interface NFTData {
     owner_address: string;
 }
 
-/*            {
-                "params":{
-                   "strike_price":{
-                      "low":"0a",
-                      "high":"00"
-                   },
-                   "expiry_date":"6973130faea3ec7e",
-                   "erc721_address":"04e34321e0bce0e4ff8ff0bcb3a9a030d423bca29a9d99cbcdd60edb9a2bf03a",
-                   "erc721_id":{
-                      "low":"01934e",
-                      "high":"00"
-                   },
-                   "premium":{
-                      "low":"01",
-                      "high":"00"
-                   }
-                },
-                "buyer_address":"01c62c52c1709acb3eb9195594e39c04323658463cfe0c641e39b99a83ba11a1",
-                "seller_address":"00",
-                "status":"01",
-                "bid_id":"01"
-             }
-             */
 
 export interface PutData {
     strike_price: BN;
@@ -58,3 +35,28 @@ export enum PutStatus {
     ACTIVE = 3,
     CLOSED = 4
 }
+
+
+/*            {
+                "params":{
+                   "strike_price":{
+                      "low":"0a",
+                      "high":"00"
+                   },
+                   "expiry_date":"6973130faea3ec7e",
+                   "erc721_address":"04e34321e0bce0e4ff8ff0bcb3a9a030d423bca29a9d99cbcdd60edb9a2bf03a",
+                   "erc721_id":{
+                      "low":"01934e",
+                      "high":"00"
+                   },
+                   "premium":{
+                      "low":"01",
+                      "high":"00"
+                   }
+                },
+                "buyer_address":"01c62c52c1709acb3eb9195594e39c04323658463cfe0c641e39b99a83ba11a1",
+                "seller_address":"00",
+                "status":"01",
+                "bid_id":"01"
+             }
+             */

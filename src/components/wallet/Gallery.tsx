@@ -135,7 +135,7 @@ const Gallery = () => {
             let tempClosedPuts = all_bids.filter(obj => (obj.status == PutStatus.CLOSED))
             setClosedPuts(closedPuts)
 
-            setOpenPutPhotos([])
+            setOpenPutPhotos([]) // empty out teh array first
             for (const put of tempOpenPuts) {
                 fetch("https://api-testnet.playoasisx.com/asset?contract_address=" + put.erc721_address.toString(16) + "&token_id=" + put.erc721_id)
                     .then(res => res.json())

@@ -46,35 +46,7 @@ import { callContract, createContract } from "utils/blockchain/starknet";
 import erc20compiledcontract from "../compiledcairo/erc20.json";
 import erc721compiledcontract from "../compiledcairo/erc721.json";
 import optionscompiledcontract from "../compiledcairo/erc721_option.json";
-
-// export async function getStaticProps() {
-//   const compiledDirectory = path.join(process.cwd(), 'src/compiledcairo');
-//   const fullOptionsPath = path.join(compiledDirectory, "erc721_option.json");
-
-//   const erc721Path = path.join(compiledDirectory, "erc721.json");
-//   const erc20Path = path.join(compiledDirectory, "erc20.json");
-
-//   //  JSON.parse(JSON.stringify(request.results)); 
-
-//   return {
-//     props: {
-//       erc721: fs.readFileSync(erc721Path).toString("ascii"),
-//       erc20: fs.readFileSync(erc20Path).toString("ascii"),
-//       nftOptions: fs.readFileSync(fullOptionsPath).toString("ascii")
-//     }
-//   };
-// }
-
 import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
-
-// interface PhotoProps {
-//   stakingpool: any;
-//   ricks: any;
-//   erc721: any;
-//   erc20: any;
-//   ricksDB: any;
-//   nftOptions: any;
-// }
 
 function getUint256CalldataFromBN(bn: number.BigNumberish) {
   return { type: "struct" as const, ...uint256.bnToUint256(bn) }
@@ -84,11 +56,13 @@ function parseInputAmountToUint256(input: string, decimals = 18) {
   return getUint256CalldataFromBN(utils.parseUnits(input, decimals).toString())
 }
 
-
 export default function Photos() {
+
+
   const optionsAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
   const erc20Address = '0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10'; // argentx test token
 
+  const toast = useToast();
   const router = useRouter();
   const [data, setData] = useState<IPutOption>();
   const [pic, setPic] = useState<NFTData>();
@@ -99,7 +73,6 @@ export default function Photos() {
     console.log("pic  ", pic);
   }, [router.query]);
 
-  const toast = useToast();
 
   async function onRegistered(optionData: IPutOption) {
 
