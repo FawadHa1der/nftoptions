@@ -27,7 +27,7 @@ export interface IPutOptionFormProps {
     onRegistered: (data: IPutOptionForm) => void;
     nftdata: NFTData | undefined;
     putdata: PutData | undefined;
-    formType: PutOptionFormType;
+    formType: PutOptionFormType | undefined;
 }
 
 export default function PutOptionForm({ onRegistered, nftdata, putdata, formType }: IPutOptionFormProps) {
