@@ -362,20 +362,14 @@ const Gallery = () => {
                     </TabPanels>
                 </Tabs>
                 <Flex my="1rem" justify="center" align="center" direction="column">
-                    <a target="_blank" href="https://www.pexels.com">
+                    <a target="_blank" href="https://testnet.aspect.co/">
                     </a>
                     <a
-                        href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+                        href="https://testnet.aspect.co/"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        Powered by
-                        <Image
-                            src="/vercel.svg"
-                            width={283 / 4}
-                            height={64 / 4}
-                            alt="/vercel.svg"
-                        />
+                        Head over to testnet.aspect.co to get some NFTs first
                     </a>
                 </Flex>
             </Box>
