@@ -75,7 +75,6 @@ export default function PutOptionForm({ onRegistered, nftdata }: IPutOptionFormP
                     {...register("expiry_date", {
                         required: "please enter the expiry_date?",
                     })} />
-                Expiry date
             </FormControl>
             <Button mt={10} colorScheme="blue" isLoading={isSubmitting} type="submit" >
                 Register your PUT 🐱‍🏍
