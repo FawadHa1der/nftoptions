@@ -266,7 +266,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic), putData: JSON.stringify(yourOpenPuts[yourOpenPutsPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourOpenPuts[yourOpenPutsPhotos.indexOf(pic)]) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -292,7 +292,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic), putData: JSON.stringify(openPuts[openPutPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(openPuts[openPutPhotos.indexOf(pic)]) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
