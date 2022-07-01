@@ -172,22 +172,20 @@ const Gallery = () => {
     }, [getStarknet().isConnected])
 
     return (
-        <div>
+        <div style={{paddingTop: "1.5vh"}}>
             <Head>
-                <title>Your NFTs, select an image to a PUT option</title>
+                <title>Select an image to purchase a put option</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Box overflow="hidden" bg="purple.100" minH="100vh">
+            <Box overflow="hidden" minH="75vh" rounded="10px" style={{border: "1px black solid", borderRadius: "50px"}}>
                 <Container>
                     <Text
-                        color="pink.800"
                         fontWeight="semibold"
                         mb="1rem"
                         textAlign="center"
-                        textDecoration="underline"
                         fontSize={["4xl", "4xl", "5xl", "5xl"]}
                     >
-                        Your NFTs, select an image to buy a PUT option for
+                        Select an image to buy a put option
                     </Text>
                     {/* <form onSubmit={handleSubmit}>
                         <InputGroup pb="1rem">
@@ -213,7 +211,7 @@ const Gallery = () => {
                     </form> */}
                 </Container>
 
-                <Tabs>
+                <Tabs align="center" variant={"line"}>
                     <TabList>
                         <Tab>Your NFTs</Tab>
                         <Tab>Your open Bids</Tab>
@@ -249,7 +247,30 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                          <Wrap px="1rem" spacing={4} justify="center">
+                            {yourOpenPuts.map((pic) => (
+                              <WrapItem
+                                key={pic.token_id}
+                                boxShadow="base"
+                                rounded="20px"
+                                overflow="hidden"
+                                bg="white"
+                                lineHeight="0"
+                                _hover={{ boxShadow: "dark-lg" }}
+                              >
+                                <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                        <Image
+                                            src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                            height={200}
+                                            width={200}
+                                            alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        />
+                                    </a>
+                                </Link>
+                              </WrapItem>
+                            ))}
+                            </Wrap>
                         </TabPanel>
                         <TabPanel>
                             <Wrap px="1rem" spacing={4} justify="center">
@@ -278,12 +299,57 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                              {yourActivePuts.map((pic) => (
+                                <WrapItem
+                                  key={pic.token_id}
+                                  boxShadow="base"
+                                  rounded="20px"
+                                  overflow="hidden"
+                                  bg="white"
+                                  lineHeight="0"
+                                  _hover={{ boxShadow: "dark-lg" }}
+                                >
+                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                      <Image
+                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        height={200}
+                                        width={200}
+                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                      />
+                                    </a>
+                                  </Link>
+                                </WrapItem>
+                              ))}
+                            </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                              {closedPuts.map((pic) => (
+                                <WrapItem
+                                  key={pic.token_id}
+                                  boxShadow="base"
+                                  rounded="20px"
+                                  overflow="hidden"
+                                  bg="white"
+                                  lineHeight="0"
+                                  _hover={{ boxShadow: "dark-lg" }}
+                                >
+                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                      <Image
+                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        height={200}
+                                        width={200}
+                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                      />
+                                    </a>
+                                  </Link>
+                                </WrapItem>
+                              ))}
+                            </Wrap>
                         </TabPanel>
-
                     </TabPanels>
                 </Tabs>
                 <Flex my="1rem" justify="center" align="center" direction="column">
