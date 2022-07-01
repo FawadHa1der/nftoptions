@@ -57,12 +57,18 @@ const Gallery = () => {
 
     const [photos, setPhotos] = useState<NFTData[]>();
 
+    const [openPuts, setOpenPuts] = useState<PutData[]>([]);
     const [openPutPhotos, setOpenPutPhotos] = useState<NFTData[]>([]);
 
-    const [openPuts, setOpenPuts] = useState<PutData[]>([]);
     const [yourOpenPuts, setYourOpenPuts] = useState<PutData[]>([]);
+    const [yourOpenPutsPhotos, setYourOpenPutsPhotos] = useState<NFTData[]>([]);
+
     const [yourActivePuts, setYourActivePuts] = useState<PutData[]>([]);
+    const [yourActivePutsPhotos, setYourActivePutsPhotos] = useState<NFTData[]>([]);
+
     const [closedPuts, setClosedPuts] = useState<PutData[]>([]);
+    const [closedPutsPhotos, setClosedPutsPhotos] = useState<NFTData[]>([]);
+
     let all_bids: PutData[] = []
 
     const toast = useToast();
@@ -112,16 +118,17 @@ const Gallery = () => {
                 return false
             })
             setOpenPuts(tempOpenPuts)
+            setOpenPutPhotos(await assembleIndividualNFTs(tempOpenPuts))
 
             let tempYourOpenPuts = all_bids.filter(obj => {
                 let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
-
                 if (obj.status == PutStatus.OPEN && obj.buyer_address.toString() === myAddress.toString()) {
                     return true
                 }
                 return false
             })
             setYourOpenPuts(tempYourOpenPuts)
+            setYourOpenPutsPhotos(await assembleIndividualNFTs(tempYourOpenPuts))
 
             let tempYourActivePuts = all_bids.filter(obj => {
                 let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
@@ -131,20 +138,22 @@ const Gallery = () => {
                 return false
             })
             setYourActivePuts(tempYourActivePuts)
+            setYourActivePutsPhotos(await assembleIndividualNFTs(tempYourActivePuts))
 
             let tempClosedPuts = all_bids.filter(obj => (obj.status == PutStatus.CLOSED))
             setClosedPuts(closedPuts)
-
-            setOpenPutPhotos([]) // empty out teh array first
-            for (const put of tempOpenPuts) {
-                fetch("https://api-testnet.playoasisx.com/asset?contract_address=" + put.erc721_address.toString(16) + "&token_id=" + put.erc721_id)
+            setClosedPutsPhotos(await assembleIndividualNFTs(closedPuts))
+        }
+        async function assembleIndividualNFTs(puts: PutData[]) {
+            let photos: NFTData[] = []
+            for (const put of puts) {
+                await fetch("https://api-testnet.playoasisx.com/asset?contract_address=" + put.erc721_address.toString(16) + "&token_id=" + put.erc721_id)
                     .then(res => res.json())
                     .then((obj) => {
-                        let existingObs = openPutPhotos
-                        existingObs?.push(obj)
-                        setOpenPutPhotos(existingObs)
+                        photos.push(obj)
                     })
             }
+            return photos
         }
 
         const enable = async () => {
@@ -168,16 +177,15 @@ const Gallery = () => {
                 // throw Error("starknet wallet not connected")
             }
         }
-
     }, [getStarknet().isConnected])
 
     return (
-        <div style={{paddingTop: "1.5vh"}}>
+        <div style={{ paddingTop: "1.5vh" }}>
             <Head>
                 <title>Select an image to purchase a put option</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Box overflow="hidden" minH="75vh" rounded="10px" style={{border: "1px black solid", borderRadius: "50px"}}>
+            <Box overflow="hidden" minH="75vh" rounded="10px" style={{ border: "1px black solid", borderRadius: "50px" }}>
                 <Container>
                     <Text
                         fontWeight="semibold"
@@ -232,7 +240,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: null } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -247,29 +255,29 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                          <Wrap px="1rem" spacing={4} justify="center">
-                            {yourOpenPuts.map((pic) => (
-                              <WrapItem
-                                key={pic.token_id}
-                                boxShadow="base"
-                                rounded="20px"
-                                overflow="hidden"
-                                bg="white"
-                                lineHeight="0"
-                                _hover={{ boxShadow: "dark-lg" }}
-                              >
-                                <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
-                                    <a>
-                                        <Image
-                                            src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                            height={200}
-                                            width={200}
-                                            alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                        />
-                                    </a>
-                                </Link>
-                              </WrapItem>
-                            ))}
+                            <Wrap px="1rem" spacing={4} justify="center">
+                                {yourOpenPutsPhotos.map((pic) => (
+                                    <WrapItem
+                                        key={pic.token_id}
+                                        boxShadow="base"
+                                        rounded="20px"
+                                        overflow="hidden"
+                                        bg="white"
+                                        lineHeight="0"
+                                        _hover={{ boxShadow: "dark-lg" }}
+                                    >
+                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic), putData: JSON.stringify(yourOpenPuts[yourOpenPutsPhotos.indexOf(pic)]) } }}>
+                                            <a>
+                                                <Image
+                                                    src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                    height={200}
+                                                    width={200}
+                                                    alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </WrapItem>
+                                ))}
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
@@ -284,7 +292,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic), putData: JSON.stringify(openPuts[openPutPhotos.indexOf(pic)]) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -300,54 +308,54 @@ const Gallery = () => {
                         </TabPanel>
                         <TabPanel>
                             <Wrap px="1rem" spacing={4} justify="center">
-                              {yourActivePuts.map((pic) => (
-                                <WrapItem
-                                  key={pic.token_id}
-                                  boxShadow="base"
-                                  rounded="20px"
-                                  overflow="hidden"
-                                  bg="white"
-                                  lineHeight="0"
-                                  _hover={{ boxShadow: "dark-lg" }}
-                                >
-                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
-                                    <a>
-                                      <Image
-                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                        height={200}
-                                        width={200}
-                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                      />
-                                    </a>
-                                  </Link>
-                                </WrapItem>
-                              ))}
+                                {yourActivePutsPhotos.map((pic) => (
+                                    <WrapItem
+                                        key={pic.token_id}
+                                        boxShadow="base"
+                                        rounded="20px"
+                                        overflow="hidden"
+                                        bg="white"
+                                        lineHeight="0"
+                                        _hover={{ boxShadow: "dark-lg" }}
+                                    >
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourActivePuts[yourActivePutsPhotos.indexOf(pic)]) } }}>
+                                            <a>
+                                                <Image
+                                                    src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                    height={200}
+                                                    width={200}
+                                                    alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </WrapItem>
+                                ))}
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
                             <Wrap px="1rem" spacing={4} justify="center">
-                              {closedPuts.map((pic) => (
-                                <WrapItem
-                                  key={pic.token_id}
-                                  boxShadow="base"
-                                  rounded="20px"
-                                  overflow="hidden"
-                                  bg="white"
-                                  lineHeight="0"
-                                  _hover={{ boxShadow: "dark-lg" }}
-                                >
-                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
-                                    <a>
-                                      <Image
-                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                        height={200}
-                                        width={200}
-                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
-                                      />
-                                    </a>
-                                  </Link>
-                                </WrapItem>
-                              ))}
+                                {closedPutsPhotos.map((pic) => (
+                                    <WrapItem
+                                        key={pic.token_id}
+                                        boxShadow="base"
+                                        rounded="20px"
+                                        overflow="hidden"
+                                        bg="white"
+                                        lineHeight="0"
+                                        _hover={{ boxShadow: "dark-lg" }}
+                                    >
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(closedPuts[closedPutsPhotos.indexOf(pic)]) } }}>
+                                            <a>
+                                                <Image
+                                                    src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                    height={200}
+                                                    width={200}
+                                                    alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </WrapItem>
+                                ))}
                             </Wrap>
                         </TabPanel>
                     </TabPanels>
