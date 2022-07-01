@@ -9,7 +9,6 @@ export interface NFTData {
     owner_address: string;
 }
 
-
 export interface PutData {
     strike_price: BN;
     expiry_date: BN;

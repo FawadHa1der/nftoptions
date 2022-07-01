@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { PutOptionFormType } from "components/wallet/PutOptionForm";
 import {
     Box,
     Container,
@@ -240,7 +241,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: null } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: null, formType: json.stringify(PutOptionFormType.CREATE) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -266,7 +267,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourOpenPuts[yourOpenPutsPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourOpenPuts[yourOpenPutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.YOUR_OPEN_BID) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -292,7 +293,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(openPuts[openPutPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: json.stringify(pic), putData: json.stringify(openPuts[openPutPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.OPEN_BIDS) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -318,7 +319,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourActivePuts[yourActivePutsPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourActivePuts[yourActivePutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.ACTIVE_BIDS) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
@@ -344,7 +345,7 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(closedPuts[closedPutsPhotos.indexOf(pic)]) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(closedPuts[closedPutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.CLOSED_BIDS) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
