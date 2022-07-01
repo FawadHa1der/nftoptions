@@ -247,7 +247,30 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                          <Wrap px="1rem" spacing={4} justify="center">
+                            {yourOpenPuts.map((pic) => (
+                              <WrapItem
+                                key={pic.token_id}
+                                boxShadow="base"
+                                rounded="20px"
+                                overflow="hidden"
+                                bg="white"
+                                lineHeight="0"
+                                _hover={{ boxShadow: "dark-lg" }}
+                              >
+                                <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                        <Image
+                                            src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                            height={200}
+                                            width={200}
+                                            alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        />
+                                    </a>
+                                </Link>
+                              </WrapItem>
+                            ))}
+                            </Wrap>
                         </TabPanel>
                         <TabPanel>
                             <Wrap px="1rem" spacing={4} justify="center">
@@ -276,12 +299,57 @@ const Gallery = () => {
                             </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                              {yourActivePuts.map((pic) => (
+                                <WrapItem
+                                  key={pic.token_id}
+                                  boxShadow="base"
+                                  rounded="20px"
+                                  overflow="hidden"
+                                  bg="white"
+                                  lineHeight="0"
+                                  _hover={{ boxShadow: "dark-lg" }}
+                                >
+                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                      <Image
+                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        height={200}
+                                        width={200}
+                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                      />
+                                    </a>
+                                  </Link>
+                                </WrapItem>
+                              ))}
+                            </Wrap>
                         </TabPanel>
                         <TabPanel>
-                            <p></p>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                              {closedPuts.map((pic) => (
+                                <WrapItem
+                                  key={pic.token_id}
+                                  boxShadow="base"
+                                  rounded="20px"
+                                  overflow="hidden"
+                                  bg="white"
+                                  lineHeight="0"
+                                  _hover={{ boxShadow: "dark-lg" }}
+                                >
+                                  <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                    <a>
+                                      <Image
+                                        src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                        height={200}
+                                        width={200}
+                                        alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                      />
+                                    </a>
+                                  </Link>
+                                </WrapItem>
+                              ))}
+                            </Wrap>
                         </TabPanel>
-
                     </TabPanels>
                 </Tabs>
                 <Flex my="1rem" justify="center" align="center" direction="column">
