@@ -65,7 +65,7 @@ import optionscompiledcontract from "../compiledcairo/erc721_option.json";
 //   };
 // }
 
-// import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
+import { transformCallsToMulticallArrays } from "starknet/utils/transaction";
 
 // interface PhotoProps {
 //   stakingpool: any;

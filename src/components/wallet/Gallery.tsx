@@ -24,8 +24,9 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 //import { useStarknet } from "@starknet-react/core";
 import { useRouter } from "next/router";
-import { NFTData, PutData } from "./NFTData";
+import { NFTData, PutData, PutStatus } from "./NFTData";
 import { getStarknet } from "get-starknet";
+import { parseFromUint256, parseFromFelt } from "utils/parser"
 
 import {
     Contract,
@@ -43,16 +44,27 @@ import {
     CompiledContract
 } from "starknet";
 import { BigNumber } from 'bignumber.js'
+import { BN } from 'bn.js'
+//import * as BN from 'bn.js'
 
 import erc721compiledcontract from "../../compiledcairo/erc721.json";
 const optionsContractAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
 import optionsCompiledContract from "../../compiledcairo/erc721_option.json";
 import { callContract, createContract } from "utils/blockchain/starknet";
 
+
 const Gallery = () => {
 
     const [photos, setPhotos] = useState<NFTData[]>();
-    const [openPut, setOpenPut] = useState<PutData[]>();
+
+    const [openPutPhotos, setOpenPutPhotos] = useState<NFTData[]>([]);
+
+    const [openPuts, setOpenPuts] = useState<PutData[]>([]);
+    const [yourOpenPuts, setYourOpenPuts] = useState<PutData[]>([]);
+    const [yourActivePuts, setYourActivePuts] = useState<PutData[]>([]);
+    const [closedPuts, setClosedPuts] = useState<PutData[]>([]);
+    let all_bids: PutData[] = []
+
     const toast = useToast();
     // const [nfts, setNFTS] = useState();
 
@@ -65,13 +77,73 @@ const Gallery = () => {
 
             const optioncontract = createContract(optionsContractAddress, optionsCompiledContract.abi)
             const view_bids_count = await callContract(optioncontract, 'view_bids_count')
-            const openBids: PutData[] = [];
 
             console.log('view_bids_count ' + view_bids_count[0])
+            // let open_bids: Array<PutData> = []
+            // let closed_bids: Array<PutData> = []
+            // let your_open_bids: Array<PutData> = []
+            // let your_active_bids: Array<PutData> = []
+
             for (let i = 0; i < view_bids_count[0]; i++) {
                 const bid_result = await callContract(optioncontract, 'view_bid', i.toString())
-                console.log('bid ---> ' + typeof bid_result[0]);
-                console.log('bid ---> ' + JSON.parse(JSON.stringify(bid_result)));
+                const mapped_data = bid_result.map((option: any) => {
+                    const data: PutData = {
+                        strike_price: uint256.uint256ToBN(option.params.strike_price),
+                        expiry_date: option.params.expiry_date,
+                        erc721_address: option.params.erc721_address,
+                        erc721_id: uint256.uint256ToBN(option.params.erc721_id),
+                        premium: uint256.uint256ToBN(option.params.premium),
+                        buyer_address: option.buyer_address,
+                        seller_address: option.seller_address,
+                        status: option.status.toNumber(),
+                        bid_id: option.bid_id
+                    };
+                    return data
+                });
+                all_bids.push(...mapped_data)
+            }
+            console.log('all data  ---> ' + JSON.stringify(all_bids));
+
+            let tempOpenPuts = all_bids.filter(obj => {
+                let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
+                if (obj.status == PutStatus.OPEN && obj.buyer_address.toString() !== myAddress.toString()) {
+                    return true
+                }
+                return false
+            })
+            setOpenPuts(tempOpenPuts)
+
+            let tempYourOpenPuts = all_bids.filter(obj => {
+                let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
+
+                if (obj.status == PutStatus.OPEN && obj.buyer_address.toString() === myAddress.toString()) {
+                    return true
+                }
+                return false
+            })
+            setYourOpenPuts(tempYourOpenPuts)
+
+            let tempYourActivePuts = all_bids.filter(obj => {
+                let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
+                if (obj.status == PutStatus.ACTIVE && (obj.buyer_address.toString() === myAddress.toString() || (obj.seller_address.toString() === myAddress.toString()))) {
+                    return true
+                }
+                return false
+            })
+            setYourActivePuts(tempYourActivePuts)
+
+            let tempClosedPuts = all_bids.filter(obj => (obj.status == PutStatus.CLOSED))
+            setClosedPuts(closedPuts)
+
+            setOpenPutPhotos([])
+            for (const put of tempOpenPuts) {
+                fetch("https://api-testnet.playoasisx.com/asset?contract_address=" + put.erc721_address.toString(16) + "&token_id=" + put.erc721_id)
+                    .then(res => res.json())
+                    .then((obj) => {
+                        let existingObs = openPutPhotos
+                        existingObs?.push(obj)
+                        setOpenPutPhotos(existingObs)
+                    })
             }
         }
 
@@ -81,7 +153,6 @@ const Gallery = () => {
                 // throw Error("starknet wallet not connected")
             }
             else {
-                console.log('connected with ', getStarknet().account.address)
                 getNFTS(getStarknet().account.address);
             }
         }
@@ -143,6 +214,7 @@ const Gallery = () => {
                 <Tabs align="center" variant={"line"}>
                     <TabList>
                         <Tab>Your NFTs</Tab>
+                        <Tab>Your open Bids</Tab>
                         <Tab>Sell a PUT option</Tab>
                         <Tab>Active PUTS</Tab>
                         <Tab>Expired PUTS</Tab>
@@ -176,6 +248,32 @@ const Gallery = () => {
                         </TabPanel>
                         <TabPanel>
                             <p></p>
+                        </TabPanel>
+                        <TabPanel>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                                {openPutPhotos.map((pic) => (
+                                    <WrapItem
+                                        key={pic.token_id}
+                                        boxShadow="base"
+                                        rounded="20px"
+                                        overflow="hidden"
+                                        bg="white"
+                                        lineHeight="0"
+                                        _hover={{ boxShadow: "dark-lg" }}
+                                    >
+                                        <Link href={{ pathname: `/photos`, query: { data: JSON.stringify(pic) } }}>
+                                            <a>
+                                                <Image
+                                                    src={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                    height={200}
+                                                    width={200}
+                                                    alt={(!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg'}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </WrapItem>
+                                ))}
+                            </Wrap>
                         </TabPanel>
                         <TabPanel>
                             <p></p>

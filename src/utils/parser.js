@@ -1,9 +1,9 @@
-import { web3 } from "web3";
-import { starknet } from "starknet"
+import { utils, web3 } from "web3";
+import { number, uint256, starknet } from "starknet"
 
 
-const { number, uint256 } = starknet;
-const { utils } = web3;
+//const { number, uint256 } = starknet;
+//const { utils } = web3;
 
 const TEN = 10;
 const DEFAULT_DECIMALS = 18;
