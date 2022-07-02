@@ -5,20 +5,25 @@ export interface NFTData {
     name: string;
     description: string;
     token_id: string;
-    copy_image_url: string;
-    owner_address: string;
+    image_url_copy: string;
+    owner: asset_owner;
+}
+
+export interface asset_owner {
+    account_address: string;
+    quantity: string
 }
 
 export interface PutData {
-    strike_price: BN;
-    expiry_date: BN;
-    erc721_address: BN;
-    erc721_id: BN;
-    premium: BN;
-    buyer_address: BN;
-    seller_address: BN;
+    strike_price: string;
+    expiry_date: string;
+    erc721_address: string;
+    erc721_id: string;
+    premium: string;
+    buyer_address: string;
+    seller_address: string;
     status: number;
-    bid_id: BN;
+    bid_id: string;
 }
 
 // namespace BidState:

@@ -60,7 +60,7 @@ function parseInputAmountToUint256(input: string, decimals = 18) {
 export default function Photos() {
 
   //  let formType: PutOptionFormType = PutOptionFormType.CREATE;
-  const optionsAddress = '0x076c00220d7c6cf0bde107c2d97ab6a6a2e590d8c36e461d10e692b6371a0a5e';
+  const optionsAddress = '0x02e6a26d2fcb7256934c822ad8a81ee40aed922b271495d8eb1e05d031192f52';
   const erc20Address = '0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10'; // argentx test token
 
   const toast = useToast();
@@ -85,11 +85,15 @@ export default function Photos() {
   }, [router.query]);
 
   async function onRegistered(optionData: IPutOptionForm) {
+    console.log('optionData -->' + JSON.stringify(optionData))
+    const date = new Date(optionData.expiry_date);
 
     const erc721_address = pic?.contract_address ? pic?.contract_address : ''
     const nftOptionsContractInstance = new Contract(optionscompiledcontract.abi as any, optionsAddress);
     const erc20ContractInstance = new Contract(erc20compiledcontract.abi as any, erc20Address);
     const erc721ContractInstance = new Contract(erc721compiledcontract.abi as any, erc721_address);
+    const expiry_date_in_sec = date.getTime();
+    console.log('expiry_date_in_sec -> ' + expiry_date_in_sec)
     setFormData(optionData);
 
     if (formType == PutOptionFormType.CREATE) {
@@ -107,7 +111,7 @@ export default function Photos() {
 
       const low_strike_price = optionData.strike_price
       const high_strike_price = '0'
-      const expiry_date = '7598437954379574398'
+      const expiry_date = expiry_date_in_sec
       const erc721_id_low = pic?.token_id ? pic?.token_id : ''
       const erc721_id_high = '0'
       const premium_low = optionData.premium
@@ -133,17 +137,17 @@ export default function Photos() {
       console.log(`Waiting for register_put_bid Tx ${transaction_response.transaction_hash} to be Accepted `);
       await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash);
       console.log('completed all the approvals');
-      toast({ description: 'Success, your bid is registered' });
+      toast({ description: 'Success, your bid is registered, data will take a few mins to reflect in the UI' });
     }
     else if (formType == PutOptionFormType.YOUR_OPEN_BID) {
       toast({ description: 'Cancelling your bid now' });
       let transaction_response = await sendTransaction(nftOptionsContractInstance, 'cancel_put_bid', { bid_id: putData?.bid_id })
-      toast({ description: 'Your bid has been cancelled' });
+      toast({ description: 'Bid cancelled, data will take a few mins to reflect in the UI' });
     }
     else if (formType == PutOptionFormType.OPEN_BIDS) {
       toast({ description: 'Selling the put option' });
       let transaction_response = await sendTransaction(nftOptionsContractInstance, 'register_put_sell', { bid_id: putData?.bid_id })
-      toast({ description: 'The option is active now' });
+      toast({ description: 'The option is active now, data will take a few mins to reflect in the UI' });
     }
   }
 
@@ -176,9 +180,9 @@ export default function Photos() {
       </Flex>
       <Divider my="1rem" />
       <Flex paddingBottom={30}>
-        <Box as="a" target="_blank" href={pic?.copy_image_url}>
+        <Box as="a" target="_blank" href={pic?.image_url_copy}>
           <Image
-            src={(!!pic) ? (!!pic.copy_image_url) ? pic.copy_image_url : '/vercel.svg' : '/vercel.svg'}
+            src={(!!pic) ? (!!pic.image_url_copy) ? pic.image_url_copy : '/vercel.svg' : '/vercel.svg'}
             width={300}
             height={300}
             style={{ borderRadius: '5px!important', float: 'left' }}

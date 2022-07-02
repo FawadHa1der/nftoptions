@@ -180,6 +180,12 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
     let bid : ERC721PUT = bids.read(bid_id_)
     let caller_address : felt = get_caller_address()
     let status : felt = bid.status
+    let _premium_token_address : felt = premium_token_address.read()
+    let option_premium : Uint256 = bid.params.premium
+    let _erc721_token_id : Uint256 = bid.params.erc721_id
+    let _erc721_token_address : felt = bid.params.erc721_address
+    let option_contract_address : felt = get_contract_address()
+
     assert bid.buyer_address = caller_address
 
     if status == BidState.OPEN:
@@ -191,6 +197,20 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
             bid_id=bid_id_,
         )
         bids.write(bid_id_, bid_to_write)
+
+        IERC20.transferFrom(
+            contract_address=_premium_token_address,
+            sender=option_contract_address,
+            recipient=caller_address,
+            amount=option_premium,
+        )
+
+        IERC721.transferFrom(
+            contract_address=_erc721_token_address,
+            from_=option_contract_address,
+            to=caller_address,
+            tokenId=_erc721_token_id,
+        )
         tempvar syscall_ptr = syscall_ptr
         tempvar pedersen_ptr = pedersen_ptr
         tempvar range_check_ptr = range_check_ptr

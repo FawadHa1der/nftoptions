@@ -43,11 +43,12 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
     let formButtonText = ''
     let strikePricePlaceHolder = '100'
     let premiumPlaceHolder = '4'
-    let date = ''
+    let datePlaceHolder = new Date(Date.now())
 
     if (!!putdata) {
-        strikePricePlaceHolder = putdata.strike_price.toString(10)
-        premiumPlaceHolder = putdata.premium.toString(10)
+        strikePricePlaceHolder = putdata.strike_price.toString()
+        premiumPlaceHolder = putdata.premium.toString()
+        datePlaceHolder = new Date(parseInt(putdata.expiry_date))
     }
     if (formType == PutOptionFormType.YOUR_OPEN_BID) {
         formButtonText = 'Cancel your bid'
@@ -76,37 +77,37 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
             </FormControl >
             <FormControl isInvalid={!!errors.strike_price ? true : false} >
                 <FormLabel htmlFor="strike_price">
-                    Strike Price in ETH
+                    Strike Price in Test Token
                     {/* the form label from chakra ui is tied to the input via the htmlFor attribute */}
                 </FormLabel>
 
                 {/* you should use the save value for the id and the property name */}
                 <Input
                     id="strike_price"
-                    placeholder={strikePricePlaceHolder}
-                    {
-                    ...register("strike_price", {
-                        required: "Please enter the strike price for your NFT",
-                    }) /* this register function will take care of the react-form binding to the ui */
-                    }
-                    //  disabled={formType != PutOptionFormType.CREATE}
-                    value={strikePricePlaceHolder}
+                    //placeholder={strikePricePlaceHolder}
+                    // {
+                    // ...register("strike_price", {
+                    //     required: "Please enter the strike price for your NFT",
+                    // }) /* this register function will take care of the react-form binding to the ui */
+                    // }
+                    disabled={formType != PutOptionFormType.CREATE}
+                    defaultValue={strikePricePlaceHolder}
                 ></Input>
                 {/* react-form will calculate the errors on submit or on dirty state */}
                 <FormErrorMessage>{errors.strike_price && errors?.strike_price?.message}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={!!errors.premium ? true : false}>
                 <FormLabel htmlFor="premium">
-                    Premium in ETH
+                    Premium in Test Token
                 </FormLabel>
                 <Input
                     id="premium"
-                    placeholder={premiumPlaceHolder}
-                    {...register("premium", {
-                        required: "please enter premium you are willing to pay?",
-                    })}
-                    value={premiumPlaceHolder}
-                //    disabled={formType != PutOptionFormType.CREATE}
+                    // placeholder={premiumPlaceHolder}
+                    // {...register("premium", {
+                    //     required: "please enter premium you are willing to pay?",
+                    // })}
+                    defaultValue={premiumPlaceHolder}
+                    disabled={formType != PutOptionFormType.CREATE}
 
                 ></Input>
                 <FormErrorMessage>{errors.premium && errors?.premium?.message}</FormErrorMessage>
@@ -114,15 +115,16 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
             <FormControl isInvalid={!!errors.expiry_date ? true : false}>
                 <FormLabel htmlFor="expiry_date">Expiry Date</FormLabel>
                 <Input id="expiry_date" type="datetime-local"
-                    {...register("expiry_date", {
-                        required: "please enter the expiry_date?",
-                    })}
-                // disabled={formType != PutOptionFormType.CREATE}
+                    // {...register("expiry_date", {
+                    //     required: "please enter the expiry_date?",
+                    // })}
+                    disabled={formType != PutOptionFormType.CREATE}
+                    defaultValue={datePlaceHolder.toLocaleDateString()}
                 />
             </FormControl>
             <Button mt={10} colorScheme="blue" isLoading={isSubmitting} type="submit" >
                 {formButtonText}
             </Button>
-        </form>
+        </form >
     );
 }
