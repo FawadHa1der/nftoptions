@@ -51,6 +51,7 @@ import erc721compiledcontract from "../../compiledcairo/erc721.json";
 const optionsContractAddress = '0x02e6a26d2fcb7256934c822ad8a81ee40aed922b271495d8eb1e05d031192f52';
 import optionsCompiledContract from "../../compiledcairo/erc721_option.json";
 import { callContract, createContract } from "utils/blockchain/starknet";
+import { getAllBidsTest, useMyLongPuts, useMyNFTSTest, useMyShortPuts } from "hooks/carioHooks";
 
 
 const Gallery = () => {
@@ -170,6 +171,10 @@ const Gallery = () => {
                 toast({ description: 'Loading all your data....might take a few secs' });
                 await getNFTS(getStarknet().account.address);
                 await getAllBids()
+                console.log('get all bids', await getAllBidsTest());
+                console.log('get all nfts test', await useMyNFTSTest(getStarknet().account.address));
+                console.log('use my long puts', await useMyLongPuts());
+                console.log('my short nfts', await useMyShortPuts());
                 toast.closeAll()
             }
         }
@@ -403,3 +408,5 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
+
