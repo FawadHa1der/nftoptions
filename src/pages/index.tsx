@@ -1,19 +1,31 @@
-import { Box } from "@chakra-ui/react";
-
-import CTASection from "components/samples/CTASection";
-import SomeText from "components/samples/SomeText";
-import { Gallery } from "components/wallet";
+import ToggleButton from 'components/common/Button/ToggleButton'
+import CardBody from 'components/common/Card/CardBody'
+import Flex from 'components/common/Flex'
+import BuyGallery from 'containers/BuyGallery'
+import SellGallery from 'containers/SellGallery'
+import React, { useState } from 'react'
+import { Card } from 'rebass'
 
 const Home = () => {
+  const [selectedTab, setSelectedTab] = useState('buy')
   return (
-    <Box mb={8} w="full" h="full" d="flex" flexDirection="column">
-      <SomeText />
-      <Box flex="1 1 auto">
-        <Gallery />
-      </Box>
-      <CTASection />
-    </Box>
-  );
-};
+    <Flex mb={8} width="100%" height="100%" flexDirection="column">
+      <Card>
+        <CardBody>
+          <ToggleButton
+            width={250}
+            selectedItemId={selectedTab}
+            onChange={id => setSelectedTab(id)}
+            items={[
+              { id: 'buy', label: 'Buy PUTs' },
+              { id: 'sell', label: 'Sell PUTs' },
+            ]}
+          />
+          <Flex mt={4}>{selectedTab === 'buy' ? <BuyGallery /> : <SellGallery />}</Flex>
+        </CardBody>
+      </Card>
+    </Flex>
+  )
+}
 
-export default Home;
+export default Home
