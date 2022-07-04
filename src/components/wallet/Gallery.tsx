@@ -64,8 +64,11 @@ const Gallery = () => {
     const [yourOpenPuts, setYourOpenPuts] = useState<PutData[]>([]);
     const [yourOpenPutsPhotos, setYourOpenPutsPhotos] = useState<NFTData[]>([]);
 
-    const [yourActivePuts, setYourActivePuts] = useState<PutData[]>([]);
-    const [yourActivePutsPhotos, setYourActivePutsPhotos] = useState<NFTData[]>([]);
+    const [yourExercisablePuts, setYourExercisablePuts] = useState<PutData[]>([]);
+    const [yourExercisablePutsPhotos, setYourExercisablePutsPhotos] = useState<NFTData[]>([]);
+
+    const [yourSoldPuts, setYourSoldPuts] = useState<PutData[]>([]);
+    const [yourSoldPutsPhotos, setYourSoldPutsPhotos] = useState<NFTData[]>([]);
 
     const [closedPuts, setClosedPuts] = useState<PutData[]>([]);
     const [closedPutsPhotos, setClosedPutsPhotos] = useState<NFTData[]>([]);
@@ -124,15 +127,26 @@ const Gallery = () => {
         setYourOpenPuts(tempYourOpenPuts)
         setYourOpenPutsPhotos(await assembleIndividualNFTs(tempYourOpenPuts))
 
-        let tempYourActivePuts = all_bids.filter(obj => {
+        let tempYourExercisablePuts = all_bids.filter(obj => {
             let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
-            if (obj.status == PutStatus.ACTIVE && (obj.buyer_address.toString() === myAddress.toString(16) || (obj.seller_address.toString() === myAddress.toString(16)))) {
+            if (obj.status == PutStatus.ACTIVE && (obj.buyer_address.toString() === myAddress.toString(16))) {
                 return true
             }
             return false
         })
-        setYourActivePuts(tempYourActivePuts)
-        setYourActivePutsPhotos(await assembleIndividualNFTs(tempYourActivePuts))
+        setYourExercisablePuts(tempYourExercisablePuts)
+        setYourExercisablePutsPhotos(await assembleIndividualNFTs(tempYourExercisablePuts))
+
+
+        let tempYourSoldPuts = all_bids.filter(obj => {
+            let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
+            if (obj.status == PutStatus.ACTIVE && ((obj.seller_address.toString() === myAddress.toString(16)))) {
+                return true
+            }
+            return false
+        })
+        setYourSoldPuts(tempYourSoldPuts)
+        setYourSoldPutsPhotos(await assembleIndividualNFTs(tempYourSoldPuts))
 
         let tempClosedPuts = all_bids.filter(obj => (obj.status == PutStatus.CLOSED))
         setClosedPuts(closedPuts)
@@ -236,8 +250,9 @@ const Gallery = () => {
                     <TabList>
                         <Tab>Your NFTs</Tab>
                         <Tab>Your open Bids</Tab>
-                        <Tab>Sell a PUT option</Tab>
-                        <Tab>Active PUTS</Tab>
+                        <Tab>Sell a PUT</Tab>
+                        <Tab>Exercise PUT</Tab>
+                        <Tab>Sold PUTS</Tab>
                         <Tab>Expired PUTS</Tab>
                     </TabList>
                     <TabPanels>
@@ -321,7 +336,7 @@ const Gallery = () => {
                         </TabPanel>
                         <TabPanel>
                             <Wrap px="1rem" spacing={4} justify="center">
-                                {yourActivePutsPhotos.map((pic) => (
+                                {yourExercisablePutsPhotos.map((pic) => (
                                     <WrapItem
                                         key={pic.token_id}
                                         boxShadow="base"
@@ -331,7 +346,33 @@ const Gallery = () => {
                                         lineHeight="0"
                                         _hover={{ boxShadow: "dark-lg" }}
                                     >
-                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourActivePuts[yourActivePutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.ACTIVE_BIDS) } }}>
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourExercisablePuts[yourExercisablePutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.ACTIVE_BIDS_EXERCISABLE) } }}>
+                                            <a>
+                                                <Image
+                                                    src={(!!pic.image_url_copy) ? pic.image_url_copy : '/vercel.svg'}
+                                                    height={200}
+                                                    width={200}
+                                                    alt={(!!pic.image_url_copy) ? pic.image_url_copy : '/vercel.svg'}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </WrapItem>
+                                ))}
+                            </Wrap>
+                        </TabPanel>
+                        <TabPanel>
+                            <Wrap px="1rem" spacing={4} justify="center">
+                                {yourSoldPutsPhotos.map((pic) => (
+                                    <WrapItem
+                                        key={pic.token_id}
+                                        boxShadow="base"
+                                        rounded="20px"
+                                        overflow="hidden"
+                                        bg="white"
+                                        lineHeight="0"
+                                        _hover={{ boxShadow: "dark-lg" }}
+                                    >
+                                        <Link href={{ pathname: `/photos`, query: { nft: JSON.stringify(pic), putData: JSON.stringify(yourSoldPuts[yourSoldPutsPhotos.indexOf(pic)]), formType: json.stringify(PutOptionFormType.ACTIVE_BIDS_SOLD) } }}>
                                             <a>
                                                 <Image
                                                     src={(!!pic.image_url_copy) ? pic.image_url_copy : '/vercel.svg'}

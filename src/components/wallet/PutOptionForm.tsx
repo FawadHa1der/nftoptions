@@ -1,6 +1,6 @@
 
 import { useForm } from "react-hook-form";
-import React from "react";
+import React, { useState } from "react";
 import { FormErrorMessage, FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
 import { number } from "starknet";
 import { useRouter } from "next/router";
@@ -19,8 +19,9 @@ export enum PutOptionFormType {
     CREATE = 1,
     YOUR_OPEN_BID = 2,
     OPEN_BIDS = 3,
-    ACTIVE_BIDS = 4,
-    CLOSED_BIDS = 5
+    ACTIVE_BIDS_EXERCISABLE = 4, // if the user is the buyer
+    ACTIVE_BIDS_SOLD = 5, //if the user is the seller
+    CLOSED_BIDS = 6
 }
 
 export interface IPutOptionFormProps {
@@ -37,33 +38,37 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
         formState: { errors, isSubmitting }, // gets errors and "loading" state
     } = useForm<IPutOptionForm>();
 
+    const [formButtonText, setFormButtonText] = useState<string>('');
+    const [strikePricePlaceHolder, setStrikePricePlaceHolder] = useState<string>('100');
+    const [premiumPlaceHolder, setPremiumPlaceHolder] = useState<string>('4');
+    const [datePlaceHolder, setDatePlaceHolder] = useState<Date>(new Date(Date.now()));
+
     const router = useRouter();
     // const pic = router.query;
     const pic = nftdata;
-    let formButtonText = ''
-    let strikePricePlaceHolder = '100'
-    let premiumPlaceHolder = '4'
-    let datePlaceHolder = new Date(Date.now())
 
     if (!!putdata) {
-        strikePricePlaceHolder = putdata.strike_price.toString()
-        premiumPlaceHolder = putdata.premium.toString()
-        datePlaceHolder = new Date(parseInt(putdata.expiry_date))
+        setStrikePricePlaceHolder(putdata.strike_price.toString())
+        setPremiumPlaceHolder(putdata.premium.toString())
+        setDatePlaceHolder(new Date(parseInt(putdata.expiry_date)))
     }
     if (formType == PutOptionFormType.YOUR_OPEN_BID) {
-        formButtonText = 'Cancel your bid'
+        setFormButtonText('Cancel your bid')
     }
     else if (formType == PutOptionFormType.OPEN_BIDS) {
-        formButtonText = 'Sell the put option'
+        setFormButtonText('Sell the put option')
     }
-    else if (formType == PutOptionFormType.ACTIVE_BIDS) {
-        formButtonText = 'Exercise your bid'
+    else if (formType == PutOptionFormType.ACTIVE_BIDS_EXERCISABLE) {
+        setFormButtonText('Exercise your bid')
+    }
+    else if (formType == PutOptionFormType.ACTIVE_BIDS_SOLD) {
+        setFormButtonText('Cannot settle yet')
     }
     else if (formType == PutOptionFormType.CLOSED_BIDS) {
-        formButtonText = ''
+        setFormButtonText('')
     }
     else {
-        formButtonText = 'Register your PUT 🐱‍🏍'
+        setFormButtonText('Register your PUT 🐱‍🏍')
     }
 
     return (
@@ -85,11 +90,11 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
                 <Input
                     id="strike_price"
                     //placeholder={strikePricePlaceHolder}
-                    // {
-                    // ...register("strike_price", {
-                    //     required: "Please enter the strike price for your NFT",
-                    // }) /* this register function will take care of the react-form binding to the ui */
-                    // }
+                    {
+                    ...register("strike_price", {
+                        required: "Please enter the strike price for your NFT",
+                    }) /* this register function will take care of the react-form binding to the ui */
+                    }
                     disabled={formType != PutOptionFormType.CREATE}
                     defaultValue={strikePricePlaceHolder}
                 ></Input>
@@ -102,10 +107,10 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
                 </FormLabel>
                 <Input
                     id="premium"
-                    // placeholder={premiumPlaceHolder}
-                    // {...register("premium", {
-                    //     required: "please enter premium you are willing to pay?",
-                    // })}
+                    placeholder={premiumPlaceHolder}
+                    {...register("premium", {
+                        required: "please enter premium you are willing to pay?",
+                    })}
                     defaultValue={premiumPlaceHolder}
                     disabled={formType != PutOptionFormType.CREATE}
 
@@ -115,14 +120,23 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
             <FormControl isInvalid={!!errors.expiry_date ? true : false}>
                 <FormLabel htmlFor="expiry_date">Expiry Date</FormLabel>
                 <Input id="expiry_date" type="datetime-local"
-                    // {...register("expiry_date", {
-                    //     required: "please enter the expiry_date?",
-                    // })}
+                    {...register("expiry_date", {
+                        required: "please enter the expiry_date?",
+                    })}
                     disabled={formType != PutOptionFormType.CREATE}
                     defaultValue={datePlaceHolder.toLocaleDateString()}
                 />
             </FormControl>
-            <Button mt={10} colorScheme="blue" isLoading={isSubmitting} type="submit" >
+            <FormLabel hidden={formType == PutOptionFormType.CREATE}>
+                Buyer Address {putdata?.buyer_address}
+                {/* the form label from chakra ui is tied to the input via the htmlFor attribute */}
+            </FormLabel>
+            <FormLabel hidden={(formType == PutOptionFormType.CREATE) || (formType == PutOptionFormType.YOUR_OPEN_BID) || (formType == PutOptionFormType.OPEN_BIDS)}>
+                Seller Address {putdata?.seller_address}
+                {/* the form label from chakra ui is tied to the input via the htmlFor attribute */}
+            </FormLabel>
+
+            <Button mt={10} colorScheme="blue" isLoading={isSubmitting} type="submit" disabled={formType == PutOptionFormType.ACTIVE_BIDS_SOLD}>
                 {formButtonText}
             </Button>
         </form >
