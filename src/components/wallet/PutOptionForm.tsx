@@ -1,6 +1,6 @@
 
 import { useForm } from "react-hook-form";
-import React, { useState } from "react";
+import React from "react";
 import { FormErrorMessage, FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
 import { number } from "starknet";
 import { useRouter } from "next/router";
@@ -38,37 +38,36 @@ export default function PutOptionForm({ onRegistered, nftdata, putdata, formType
         formState: { errors, isSubmitting }, // gets errors and "loading" state
     } = useForm<IPutOptionForm>();
 
-    const [formButtonText, setFormButtonText] = useState<string>('');
-    const [strikePricePlaceHolder, setStrikePricePlaceHolder] = useState<string>('100');
-    const [premiumPlaceHolder, setPremiumPlaceHolder] = useState<string>('4');
-    const [datePlaceHolder, setDatePlaceHolder] = useState<Date>(new Date(Date.now()));
-
     const router = useRouter();
     // const pic = router.query;
     const pic = nftdata;
+    let formButtonText = ''
+    let strikePricePlaceHolder = '100'
+    let premiumPlaceHolder = '4'
+    let datePlaceHolder = new Date(Date.now())
 
     if (!!putdata) {
-        setStrikePricePlaceHolder(putdata.strike_price.toString())
-        setPremiumPlaceHolder(putdata.premium.toString())
-        setDatePlaceHolder(new Date(parseInt(putdata.expiry_date)))
+        strikePricePlaceHolder = putdata.strike_price.toString()
+        premiumPlaceHolder = putdata.premium.toString()
+        datePlaceHolder = new Date(parseInt(putdata.expiry_date))
     }
     if (formType == PutOptionFormType.YOUR_OPEN_BID) {
-        setFormButtonText('Cancel your bid')
+        formButtonText = 'Cancel your bid'
     }
     else if (formType == PutOptionFormType.OPEN_BIDS) {
-        setFormButtonText('Sell the put option')
+        formButtonText = 'Sell the put option'
     }
     else if (formType == PutOptionFormType.ACTIVE_BIDS_EXERCISABLE) {
-        setFormButtonText('Exercise your bid')
+        formButtonText = 'Exercise your bid'
     }
     else if (formType == PutOptionFormType.ACTIVE_BIDS_SOLD) {
-        setFormButtonText('Cannot settle yet')
+        formButtonText = 'Cannot settle yet'
     }
     else if (formType == PutOptionFormType.CLOSED_BIDS) {
-        setFormButtonText('')
+        formButtonText = ''
     }
     else {
-        setFormButtonText('Register your PUT 🐱‍🏍')
+        formButtonText = 'Register your PUT 🐱‍🏍'
     }
 
     return (

@@ -99,21 +99,6 @@ export default function Photos() {
     if (formType == PutOptionFormType.CREATE) {
       toast({ description: 'You will be asked to confirm multiple times' })
 
-      /*struct ERC721PUT:
-          member strike_price : Uint256
-          member expiry_date : felt
-          member erc721_address : felt
-          member erc721_id : Uint256
-          member premium : Uint256
-      end
-      8 fields in the transaction
-       */
-      // compileCalldata({
-      //   receiver: number.toBN(activeAccount).toString(), //receiver (self)
-      //   amount: getUint256CalldataFromBN(
-      //     utils.parseUnits(mintAmount, 18).toString()
-      //   ), // amount
-      // })
       const strike_price = getUint256CalldataFromBN(optionData.strike_price)
       const expiry_date = expiry_date_in_sec
       const erc721_id = getUint256CalldataFromBN(pic?.token_id ? pic?.token_id : 0)
