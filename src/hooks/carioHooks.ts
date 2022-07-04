@@ -11,8 +11,9 @@ const optionsContractAddress = '0x02e6a26d2fcb7256934c822ad8a81ee40aed922b271495
 
 let bidsCache: PutData[] = [];
 
-export async function getAllBids() : Promise<PutData[]> {
+export async function getAllBidsTest() : Promise<PutData[]> {
   // would be good to generalise these to a deployement file
+  console.log('!'.repeat(100));
   const optioncontract = createContract(optionsContractAddress, optionsCompiledContract.abi);
   const view_bids_count = await callContract(optioncontract, 'view_bids_count');
 
@@ -43,13 +44,13 @@ export async function getAllBids() : Promise<PutData[]> {
 }
 
 
-export async function useMyNFTS(user: string) : Promise<NFTData[]> {
+export async function useMyNFTSTest(user: string) : Promise<NFTData[]> {
   const nfts = await getNfts(user);
 
   let localCache = bidsCache;
 
   if (localCache.length === 0) {
-    localCache = await getAllBids();
+    localCache = await getAllBidsTest();
     bidsCache.push(...localCache)
   }
 
@@ -78,7 +79,7 @@ export async function useMyLongPuts(): Promise<PutData[]> {
   let localCache = bidsCache;
 
   if (localCache.length === 0) {
-    localCache = await getAllBids();
+    localCache = await getAllBidsTest();
     bidsCache.push(...localCache)
   }
 
@@ -105,7 +106,7 @@ export async function useMyShortPuts(): Promise<PutData[]> {
   let localCache = bidsCache;
 
   if (localCache.length === 0) {
-    localCache = await getAllBids();
+    localCache = await getAllBidsTest();
     bidsCache.push(...localCache)
   }
 
@@ -131,7 +132,7 @@ async function getAllRelevantPuts(): Promise<PutData[]> {
   let localCache = bidsCache;
 
   if (localCache.length === 0) {
-    localCache = await getAllBids();
+    localCache = await getAllBidsTest();
     bidsCache.push(...localCache)
   }
   const relevantPuts: PutData[] = [];
