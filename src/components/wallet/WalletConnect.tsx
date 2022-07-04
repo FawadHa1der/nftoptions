@@ -1,28 +1,20 @@
-import { Button } from "@chakra-ui/react";
 //import { useStarknet } from "@starknet-react/core";
-import { getStarknet } from "get-starknet";
-import { useEffect, useState } from "react";
+import Button from 'components/common/Button'
+import { IconType } from 'components/common/Icon'
+import { getStarknet } from 'get-starknet'
+import React, { useState } from 'react'
 
 const WalletConnect = () => {
-  // const starknet = getStarknet()
-
-  // const account = getStarknet().account.address;
-  // const hasStarknet = getStarknet().isConnected;
-  const [argentAccount, setArgentAccount] = useState("")
+  const [argentAccount, setArgentAccount] = useState('')
   const enable = async () => {
     const [userWalletContractAddress] = await getStarknet().enable()
     if (getStarknet().isConnected === true) {
       console.log('connected with ', getStarknet().account.address)
       setArgentAccount(getStarknet().account.address)
-    }
-    else {
+    } else {
       // throw Error("starknet wallet not connected")
     }
   }
-
-  // useEffect(() => {
-  //   setArgentAccount(getStarknet().account.address)
-  // }, [getStarknet().account.address])
 
   async function enableArgentX() {
     // Check if wallet extension is installed and initialized.
@@ -32,61 +24,47 @@ const WalletConnect = () => {
     // checks that enable succeeded
     if (getStarknet().isConnected === false) {
       //  throw Error("starknet wallet not connected")
-    }
-    else {
+    } else {
       console.log('show modal connected with ', getStarknet().account.address)
       setArgentAccount(getStarknet().account.address)
-
     }
   }
 
   //  enable()
   if (getStarknet().isConnected === false) {
     console.log('yep its not enabled')
-  }
-  else {
+  } else {
     console.log('yep its enabled now')
   }
-  return (getStarknet().isConnected === false) ? (
-    !!argentAccount ? (
-      <Button
-        ml="4"
-        textDecoration="none !important"
-        outline="none !important"
-        boxShadow="none !important"
-      >
-        <a href="https://github.com/argentlabs/argent-x">Get Argent-X</a>
-      </Button>
+  return getStarknet().isConnected === false ? (
+    argentAccount ? (
+      <Button ml={2} variant="primary" href="https://github.com/argentlabs/argent-x" label="Get Argent X" />
     ) : (
       <Button
-        ml="4"
-        textDecoration="none !important"
-        outline="none !important"
-        boxShadow="none !important"
+        ml={2}
+        variant="primary"
         onClick={() => {
           enableArgentX()
         }}
-      >
-        Connect Wallet
-      </Button>
+        label="Connect Wallet"
+      />
     )
   ) : (
     <Button
-      ml="4"
-      textDecoration="none !important"
-      outline="none !important"
-      boxShadow="none !important"
+      ml={2}
+      leftIcon={IconType.ArgentX}
       // HACK: refresh to disconnect
       // TODO: actually disconnect when supported in starknet-react
-      onClick={() => { window.location.reload(); }}
-    >
-      {argentAccount
-        ? `${argentAccount.substring(0, 4)}...${argentAccount.substring(
-          argentAccount.length - 4
-        )}`
-        : "No Account"}
-    </Button>
-  );
-};
+      onClick={() => {
+        window.location.reload()
+      }}
+      label={
+        argentAccount
+          ? `${argentAccount.substring(0, 4)}...${argentAccount.substring(argentAccount.length - 4)}`
+          : 'No Account'
+      }
+    />
+  )
+}
 
-export default WalletConnect;
+export default WalletConnect
