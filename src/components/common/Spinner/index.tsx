@@ -1,7 +1,7 @@
-import useThemeColor from 'hooks/useThemeColor'
-import { MarginProps } from 'types'
+import useThemeColor from 'hooks/ui/useThemeColor'
 import React from 'react'
 import styled from 'styled-components'
+import { MarginProps } from 'types'
 
 import Box from '../Box'
 

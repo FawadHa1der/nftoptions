@@ -1,4 +1,4 @@
-import useThemeColor from 'hooks/useThemeColor'
+import useThemeColor from 'hooks/ui/useThemeColor'
 import React from 'react'
 import { Accordion as AccessibleAccordion } from 'react-accessible-accordion'
 import styled from 'styled-components'

@@ -1,11 +1,10 @@
-import Link from 'next/link'
-
-import { WalletConnect } from 'components/wallet'
-import Flex from 'components/common/Flex'
-import Text from 'components/common/Text'
 import IconButton from 'components/common/Button/IconButton'
-import useIsDarkMode from 'hooks/useIsDarkMode'
+import Flex from 'components/common/Flex'
 import { IconType } from 'components/common/Icon'
+import Text from 'components/common/Text'
+import { WalletConnect } from 'components/wallet'
+import useIsDarkMode from 'hooks/ui/useIsDarkMode'
+import React from 'react'
 
 const Header = () => {
   const [isDarkMode, setIsDarkMode] = useIsDarkMode()

@@ -1,9 +1,9 @@
-import Box from 'components/Box'
-import useThemeColor from 'hooks/useThemeColor'
-import useThemeValue from 'hooks/useThemeValue'
-import { ResponsiveValue } from 'types'
+import Box from 'components/common/Box'
+import useThemeColor from 'hooks/ui/useThemeColor'
+import useThemeValue from 'hooks/ui/useThemeValue'
 import React from 'react'
 import { MarginProps } from 'styled-system'
+import { ResponsiveValue } from 'types'
 
 export type CircularProgressProps = {
   outerWidth: ResponsiveValue

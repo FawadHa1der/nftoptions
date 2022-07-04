@@ -1,5 +1,5 @@
 import Box from 'components/common/Box'
-import useThemeColor from 'hooks/useThemeColor'
+import useThemeColor from 'hooks/ui/useThemeColor'
 import React from 'react'
 import {
   Line,

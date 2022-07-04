@@ -1,10 +1,11 @@
 import OneInchIcon from 'components/common/Icon/1inchIcon'
-import useThemeColor from 'hooks/useThemeColor'
-import useThemeValue from 'hooks/useThemeValue'
-import { ResponsiveValue } from 'types'
+import useThemeColor from 'hooks/ui/useThemeColor'
+import useThemeValue from 'hooks/ui/useThemeValue'
 import React from 'react'
 import * as Feather from 'react-feather'
+import { ResponsiveValue } from 'types'
 
+import ArgentXIcon from './ArgentXIcon'
 import DiscordIcon from './DiscordIcon'
 import DotIcon from './DotIcon'
 import EthereumIcon from './EthereumIcon'
@@ -22,7 +23,6 @@ import TwitterIcon from './TwitterIcon'
 import UniswapIcon from './UniswapIcon'
 import WalletConnectIcon from './WalletConnectIcon'
 import WalletLinkIcon from './WalletLinkIcon'
-import ArgentXIcon from './ArgentXIcon'
 
 export enum IconType {
   MoreHorizontal = 'MoreHorizontal',
