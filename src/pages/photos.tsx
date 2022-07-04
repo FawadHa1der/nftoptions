@@ -108,7 +108,12 @@ export default function Photos() {
       end
       8 fields in the transaction
        */
-
+      // compileCalldata({
+      //   receiver: number.toBN(activeAccount).toString(), //receiver (self)
+      //   amount: getUint256CalldataFromBN(
+      //     utils.parseUnits(mintAmount, 18).toString()
+      //   ), // amount
+      // })
       const low_strike_price = optionData.strike_price
       const high_strike_price = '0'
       const expiry_date = expiry_date_in_sec
