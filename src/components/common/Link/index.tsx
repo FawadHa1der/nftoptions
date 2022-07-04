@@ -1,9 +1,9 @@
-import useFontSize from 'hooks/useFontSize'
-import useLineHeight from 'hooks/useLineHeight'
-import getVariantSX from 'utils/getVariantSX'
-import isExternalURL from 'utils/isExternalURL'
+import useFontSize from 'hooks/ui/useFontSize'
+import useLineHeight from 'hooks/ui/useLineHeight'
 import React from 'react'
 import { Link as RebassLink } from 'rebass'
+import getVariantSX from 'utils/getVariantSX'
+import isExternalURL from 'utils/isExternalURL'
 
 import { IconType } from '../Icon'
 import IconSVG from '../Icon/IconSVG'
@@ -37,23 +37,25 @@ export default function Link({
   return (
     <NextLink href={href}>
       <RebassLink variant="textLink" href={href} target={target} {...props} sx={textSx}>
-        {leftIcon ? (
-          <>
-            <IconSVG strokeWidth={3} size={lineHeightSize} icon={leftIcon} />
-            &nbsp;&nbsp;
-          </>
-        ) : null}
-        {children}
-        {showRightIcon ? (
-          <>
-            &nbsp;
-            <IconSVG
-              strokeWidth={3}
-              size={fontSize}
-              icon={isExternalURL(href) || target === '_blank' ? IconType.ArrowUpRight : IconType.ArrowRight}
-            />
-          </>
-        ) : null}
+        <>
+          {leftIcon ? (
+            <>
+              <IconSVG strokeWidth={3} size={lineHeightSize} icon={leftIcon} />
+              &nbsp;&nbsp;
+            </>
+          ) : null}
+          {children}
+          {showRightIcon ? (
+            <>
+              &nbsp;
+              <IconSVG
+                strokeWidth={3}
+                size={fontSize}
+                icon={isExternalURL(href) || target === '_blank' ? IconType.ArrowUpRight : IconType.ArrowRight}
+              />
+            </>
+          ) : null}
+        </>
       </RebassLink>
     </NextLink>
   )

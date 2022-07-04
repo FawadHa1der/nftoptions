@@ -1,5 +1,5 @@
-import theme from '../theme'
-import getValue from '../utils/getValue'
+import theme from '../../theme'
+import getValue from '../../utils/getValue'
 import useThemeValue from './useThemeValue'
 
 // TODO: Remove this in favor of something more reliable

@@ -1,9 +1,9 @@
 import Flex from 'components/common/Flex'
-import useFontSize from 'hooks/useFontSize'
+import useFontSize from 'hooks/ui/useFontSize'
+import useLineHeight from 'hooks/ui/useLineHeight'
 import React from 'react'
 import { LayoutProps, MarginProps } from 'styled-system'
 
-import useLineHeight from '../hooks/useLineHeight'
 import { TextVariant } from '../Text'
 import Shimmer from '.'
 

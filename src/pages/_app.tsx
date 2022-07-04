@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import '@fontsource/lexend/latin.css'
 import 'material-react-toastify/dist/ReactToastify.css'
 import 'styles/globals.css'
 import '@fontsource/inter/variable-full.css'
@@ -7,7 +6,6 @@ import '@fontsource/inter/variable-full.css'
 import { Layout } from 'components/layout'
 import { ToastContainer } from 'material-react-toastify'
 import { AppProps } from 'next/app'
-// import { StarknetProvider } from "@starknet-react/core";
 import Head from 'next/head'
 import { DefaultSeo } from 'next-seo'
 import React from 'react'
