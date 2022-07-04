@@ -50,7 +50,7 @@ export async function useMyNFTS(user: string) : Promise<NFTData[]> {
 
   if (localCache.length === 0) {
     localCache = await getAllBids();
-    bidsCache.push(...await getAllBids()); // update cache
+    bidsCache.push(...localCache)
   }
 
   const validNfts: NFTData[] = [];
@@ -79,14 +79,14 @@ export async function useMyLongPuts(): Promise<PutData[]> {
 
   if (localCache.length === 0) {
     localCache = await getAllBids();
-    bidsCache.push(...await getAllBids()); // update cache
+    bidsCache.push(...localCache)
   }
 
   const usersLongs: PutData[] = [];
 
   let myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16);
   for(const each of localCache) {
-    if (each.seller_address === myAddress.toString(16)) {
+    if (each.buyer_address === myAddress.toString(16)) {
       // already has an associated bid
       if (each.status === PutStatus.ACTIVE || each.status === PutStatus.OPEN) {
         // I am the buyer
@@ -106,7 +106,7 @@ export async function useMyShortPuts(): Promise<PutData[]> {
 
   if (localCache.length === 0) {
     localCache = await getAllBids();
-    bidsCache.push(...await getAllBids()); // update cache
+    bidsCache.push(...localCache)
   }
 
   const userShorts: PutData[] = [];
@@ -132,7 +132,7 @@ async function getAllRelevantPuts(): Promise<PutData[]> {
 
   if (localCache.length === 0) {
     localCache = await getAllBids();
-    bidsCache.push(...await getAllBids()); // update cache
+    bidsCache.push(...localCache)
   }
   const relevantPuts: PutData[] = [];
   for (const bid of localCache) {
