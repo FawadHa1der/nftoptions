@@ -56,6 +56,20 @@ const BuyButton = withSuspense(
         d: erc721_id,
         e: premiumUint256,
       }
+      const balanceResult = await callContract(
+        ERC20_CONTRACT_INSTANCE,
+        'balance',
+        address
+      )
+
+      const existingBalance = uint256.uint256ToBN(balanceResult[0]).toNumber()
+      if (existingBalance < parseInt(premium)) {
+        setIsLoading(false)
+        createToast({
+          description: 'Not enough balance/TEST tokens in your wallet.',
+          variant: 'error',
+        })
+      }
 
       const allowanceResult = await callContract(
         ERC20_CONTRACT_INSTANCE,
@@ -63,7 +77,9 @@ const BuyButton = withSuspense(
         address,
         OPTIONS_CONTRACT_ADDRESS
       )
+
       const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0]).toNumber()
+
       console.log('allowance   ', existingMoneyAllowance)
       if (existingMoneyAllowance < parseInt(premium)) {
         try {
