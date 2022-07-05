@@ -16,10 +16,10 @@ type Props = {
   nftData: NFTData
   option?: PutData
   isSelected?: boolean
-  handleClick?: (nftData: NFTData) => void
+  onClick?: (nftData: NFTData) => void
 } & MarginProps
 
-export default function GalleryCard({ nftData, option, handleClick, isSelected = false }: Props): JSX.Element {
+export default function GalleryCard({ nftData, option, onClick: handleClick, isSelected = false }: Props): JSX.Element {
   const background = useThemeColor('background')
   return (
     <Card
