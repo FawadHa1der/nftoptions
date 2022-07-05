@@ -3,14 +3,11 @@ import { getStarknet } from 'get-starknet'
 import useSWR from 'swr'
 
 import useBids, { PutData, PutStatus } from './useBids'
+import { PutDataWithNFT } from './usePuts'
 
-async function fetcher({ bids }: { bids: PutData[] }): Promise<PutData[]> {
+async function fetcher({ bids }: { bids: PutData[] }): Promise<PutDataWithNFT[]> {
   const myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
-  const myBids = bids.filter(
-    bid =>
-      bid.buyer_address === myAddress.toString(16) &&
-      bid.status === PutStatus.ACTIVE
-  )
+  const myBids = bids.filter(bid => bid.buyer_address === myAddress.toString(16) && bid.status === PutStatus.ACTIVE)
 
   const nfts = await Promise.all(
     myBids.map(async bid =>
@@ -26,11 +23,11 @@ async function fetcher({ bids }: { bids: PutData[] }): Promise<PutData[]> {
   }))
 }
 
-const EMPTY: PutData[] = []
+const EMPTY: PutDataWithNFT[] = []
 
-export default function useMyShortPuts(): PutData[] {
+export default function useMyShortPuts(): PutDataWithNFT[] {
   const bids = useBids()
   const { data } = useSWR({ key: 'MyShortPuts', bids }, fetcher)
-  console.log('data', data);
+  console.log('data', data)
   return data ?? EMPTY
 }

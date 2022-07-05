@@ -17,6 +17,7 @@ const BuyGallery = withSuspense(
     const [nfts, mutateMyNFTs] = useMyNFTs()
     const [myLongPuts, mutateMyLongPuts] = useMyLongPuts()
     const [selectedNFT, setSelectedNFT] = useState<NFTData | null>(null)
+
     const handleClickNFT = (nftData: NFTData) => {
       if (selectedNFT?.token_id === nftData.token_id) {
         setSelectedNFT(null)
@@ -32,8 +33,22 @@ const BuyGallery = withSuspense(
 
     return (
       <Flex width="100%">
-        <Box width="100%" mr={6} sx={{ transition: 'all 0.1s ease-out' }}>
-          {myLongPuts.length > 0 ? <Text variant="heading">My Puts</Text> : null}
+        <Box flexGrow={1} mr={6}>
+          {myLongPuts.length > 0 ? (
+            <Box>
+              <Text mb={4} variant="heading">
+                My Puts
+              </Text>
+              <Grid
+                width="100%"
+                sx={{ gridTemplateColumns: `repeat(auto-fill, minmax(240px, 1fr))`, columnGap: 6, rowGap: 6 }}
+              >
+                {myLongPuts.map(put => (
+                  <GalleryCard key={put.bid_id} nftData={put.nftData} option={put} />
+                ))}
+              </Grid>
+            </Box>
+          ) : null}
           <Box width="100%">
             <Text mb={4} variant="heading">
               My NFTs
