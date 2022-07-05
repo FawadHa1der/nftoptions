@@ -13,6 +13,7 @@ import { Contract, uint256 } from 'starknet'
 import { MarginProps } from 'styled-system'
 import { callContract, sendTransaction } from 'utils/blockchain/starknet'
 import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
+import { BN } from 'bn.js'
 
 type Props = {
   strikePrice: string
@@ -58,12 +59,12 @@ const BuyButton = withSuspense(
       }
       const balanceResult = await callContract(
         ERC20_CONTRACT_INSTANCE,
-        'balance',
+        'balanceOf',
         address
       )
 
-      const existingBalance = uint256.uint256ToBN(balanceResult[0]).toNumber()
-      if (existingBalance < parseInt(premium)) {
+      const existingBalance = uint256.uint256ToBN(balanceResult[0])
+      if (existingBalance.ltn(parseInt(premium))) {
         setIsLoading(false)
         createToast({
           description: 'Not enough balance/TEST tokens in your wallet.',
@@ -78,10 +79,9 @@ const BuyButton = withSuspense(
         OPTIONS_CONTRACT_ADDRESS
       )
 
-      const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0]).toNumber()
-
+      const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0])
       console.log('allowance   ', existingMoneyAllowance)
-      if (existingMoneyAllowance < parseInt(premium)) {
+      if (existingMoneyAllowance.ltn(parseInt(premium))) {
         try {
           await sendTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
             spender: OPTIONS_CONTRACT_ADDRESS,
