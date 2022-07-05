@@ -1,7 +1,7 @@
-import mergeVariantSX from 'utils/mergeVariantSX'
 import React, { useMemo } from 'react'
 import { Button as RebassButton } from 'rebass'
 import { LayoutProps, MarginProps, PaddingProps } from 'styled-system'
+import mergeVariantSX from 'utils/mergeVariantSX'
 
 import Center from '../Center'
 import Flex from '../Flex'

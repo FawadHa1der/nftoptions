@@ -1,5 +1,5 @@
-import useIsMobile from 'hooks/useIsMobile'
 import { Placement } from '@popperjs/core'
+import useIsMobile from 'hooks/useIsMobile'
 import React, { useState } from 'react'
 
 import Button, { ButtonProps } from '../Button'

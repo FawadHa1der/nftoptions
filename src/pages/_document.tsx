@@ -1,8 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import createEmotionServer from '@emotion/server/create-instance'
-import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document'
+import Document, { DocumentContext,Head, Html, Main, NextScript } from 'next/document'
 import * as React from 'react'
-
 import createEmotionCache from 'styles/createEmotionCache'
 import getAssetSrc from 'utils/getAssetSrc'
 

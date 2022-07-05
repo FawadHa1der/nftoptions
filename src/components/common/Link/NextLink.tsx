@@ -1,6 +1,6 @@
-import isExternalURL from 'utils/isExternalURL'
 import NextLinkRaw from 'next/link'
 import React from 'react'
+import isExternalURL from 'utils/isExternalURL'
 
 type Props = {
   href?: string | null

@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { CustomIconProps } from './IconSVG'
 
 export default function ArgentXIcon({ size, color }: CustomIconProps) {

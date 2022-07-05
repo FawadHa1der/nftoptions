@@ -1,5 +1,5 @@
-import { MarginProps } from 'types'
 import React from 'react'
+import { MarginProps } from 'types'
 
 import Center from '../Center'
 import IconSVG, { SVGIconProps } from './IconSVG'

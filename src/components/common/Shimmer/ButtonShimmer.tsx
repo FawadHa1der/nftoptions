@@ -1,6 +1,6 @@
-import getVariantSX from 'utils/getVariantSX'
 import React from 'react'
 import { LayoutProps, MarginProps } from 'styled-system'
+import getVariantSX from 'utils/getVariantSX'
 
 import { ButtonSize, getButtonSizeVariant } from '../Button'
 import Shimmer from '.'

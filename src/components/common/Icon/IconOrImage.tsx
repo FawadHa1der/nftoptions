@@ -1,7 +1,7 @@
 import Image from 'components/common/Image'
+import React from 'react'
 import { MarginProps } from 'types'
 import coerce from 'utils/coerce'
-import React from 'react'
 
 import Icon from '.'
 import { IconType, SVGIconProps } from './IconSVG'

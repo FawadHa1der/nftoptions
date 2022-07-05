@@ -1,6 +1,6 @@
-import emptyFunction from 'utils/emptyFunction'
 import React from 'react'
 import ReactCollapsible from 'react-collapsible'
+import emptyFunction from 'utils/emptyFunction'
 
 import Flex, { FlexProps } from '../Flex'
 

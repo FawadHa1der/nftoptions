@@ -1,10 +1,10 @@
-import emptyFunction from 'utils/emptyFunction'
 import { Placement } from '@popperjs/core'
 import React, { useEffect } from 'react'
 import { usePopperTooltip } from 'react-popper-tooltip'
 import { TriggerType } from 'react-popper-tooltip'
 import Fade from 'react-reveal/Fade'
 import { Box } from 'rebass'
+import emptyFunction from 'utils/emptyFunction'
 
 export type PopoverProps = {
   children: React.ReactNode

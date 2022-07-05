@@ -1,9 +1,9 @@
 import useIsDarkMode from 'hooks/useIsDarkMode'
 import useIsMobile from 'hooks/useIsMobile'
-import theme from 'theme'
-import getValue from 'utils/getValue'
 import React from 'react'
 import ReactModal from 'react-modal'
+import theme from 'theme'
+import getValue from 'utils/getValue'
 
 import IconButton from '../Button/IconButton'
 import Card, { CardProps } from '../Card'

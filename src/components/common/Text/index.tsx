@@ -1,7 +1,7 @@
-import { LayoutProps, MarginProps } from 'types'
 import React from 'react'
 import { Text as RebassText } from 'rebass'
 import { FlexGrowProps } from 'styled-system'
+import { LayoutProps, MarginProps } from 'types'
 
 export type TextVariant =
   | 'heroTitle'

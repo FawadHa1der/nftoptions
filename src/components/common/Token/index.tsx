@@ -1,7 +1,7 @@
-import getVariantSX from 'utils/getVariantSX'
 import React, { useMemo } from 'react'
 import { Text as RebassText } from 'rebass'
 import { MarginProps } from 'styled-system'
+import getVariantSX from 'utils/getVariantSX'
 
 export type TokenVariant = 'default' | 'primary' | 'error' | 'warning'
 
