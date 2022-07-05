@@ -43,9 +43,9 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
     return (
       <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} height={400}>
         <CardBody>
-          <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
-            <Text variant="heading">Select an NFT or PUT</Text>
-          </Flex>
+          <Text mx="auto" variant="heading">
+            Select an NFT or PUT
+          </Text>
         </CardBody>
       </Card>
     )
@@ -53,7 +53,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
   const { name, aspect_link } = nftData
 
   return (
-    <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} height="max-content">
+    <Card {...styleProps} width={ACTION_CARD_WIDTH} height="max-content">
       <CardBody>
         <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
           <Text variant="heading">Buy PUT for</Text>
