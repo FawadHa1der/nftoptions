@@ -1,21 +1,22 @@
+const APP_NAME = 'Lyra NFT'
 /** @type {import('next-seo').DefaultSeoProps} */
 const defaultSEOConfig = {
-  title: "cairopal",
+  title: APP_NAME,
   titleTemplate: "%s",
-  defaultTitle: "cairopal",
+  defaultTitle: APP_NAME,
   description: "Flexible Starknet Dapp Template",
   canonical: "https://nextarter-chakra.sznm.dev",
   openGraph: {
     url: "https://nextarter-chakra.sznm.dev",
-    title: "cairopal",
+    title: APP_NAME,
     description: "Flexible Starknet Dapp Template",
     images: [
       {
         url: "https://cairopal.xyz/cairopal.png",
-        alt: "cairopal cairopal",
+        alt: APP_NAME,
       },
     ],
-    site_name: "cairopal",
+    site_name: APP_NAME,
   },
   twitter: {
     handle: "@fawadha1der",

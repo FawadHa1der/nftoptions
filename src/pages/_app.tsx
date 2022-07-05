@@ -1,37 +1,24 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { ChakraProvider } from "@chakra-ui/react";
-import { EmotionCache } from "@emotion/cache";
-import { CacheProvider } from "@emotion/react";
-import { ToastContainer } from "material-react-toastify";
-import { DefaultSeo } from "next-seo";
-import { AppProps } from "next/app";
-// import { StarknetProvider } from "@starknet-react/core";
-import Head from "next/head";
-import "@fontsource/lexend/latin.css";
+import 'material-react-toastify/dist/ReactToastify.css'
+import 'styles/globals.css'
+import '@fontsource/inter/variable-full.css'
 
-import defaultSEOConfig from "../../next-seo.config";
-import { Layout } from "components/layout";
+import { Layout } from 'components/layout'
+import NoSSR from 'components/layout/NoSSR'
+import { ToastContainer } from 'material-react-toastify'
+import { AppProps } from 'next/app'
+import Head from 'next/head'
+import { DefaultSeo } from 'next-seo'
+import React from 'react'
+import { SWRConfig } from 'swr'
+import ThemeProvider from 'theme/ThemeProvider'
 
-import "material-react-toastify/dist/ReactToastify.css";
-import createEmotionCache from "styles/createEmotionCache";
-import customTheme from "styles/customTheme";
-import "styles/globals.css";
+import defaultSEOConfig from '../../next-seo.config'
 
-const clientSideEmotionCache = createEmotionCache();
-
-interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache;
-}
-
-const MyApp = ({
-  Component,
-  pageProps,
-  emotionCache = clientSideEmotionCache,
-}: MyAppProps) => {
-
+const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <CacheProvider value={emotionCache}>
-      <ChakraProvider theme={customTheme}>
+    <SWRConfig value={{ suspense: true }}>
+      <ThemeProvider>
         <Head>
           <meta
             name="viewport"
@@ -39,17 +26,15 @@ const MyApp = ({
           />
         </Head>
         <DefaultSeo {...defaultSEOConfig} />
-        <ToastContainer />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ChakraProvider>
-    </CacheProvider>
-  );
-};
+        <NoSSR>
+          <ToastContainer />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </NoSSR>
+      </ThemeProvider>
+    </SWRConfig>
+  )
+}
 
-MyApp.defaultProps = {
-  emotionCache: clientSideEmotionCache,
-};
-
-export default MyApp;
+export default MyApp
