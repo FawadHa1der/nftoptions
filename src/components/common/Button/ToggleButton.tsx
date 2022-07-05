@@ -42,13 +42,13 @@ export default function ToggleButton<ToggleButtonItemID extends string | number 
             height="100%"
             width="100%"
             onClick={() => (onChange ? onChange(item.id) : null)}
-            bg={isSelected ? 'cardBackgroundSolid' : 'transparent'}
+            bg={isSelected ? 'background' : 'transparent'}
             alignItems="center"
             justifyContent="center"
             sx={{
               borderRadius: 'circle',
               cursor: 'pointer',
-              ':hover': { bg: isSelected ? 'cardBackgroundSolid' : 'buttonHover' },
+              ':hover': { bg: isSelected ? 'active' : 'buttonHover' },
             }}
             px={4}
           >

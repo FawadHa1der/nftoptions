@@ -3,22 +3,20 @@ import Button from 'components/common/Button'
 import ButtonShimmer from 'components/common/Shimmer/ButtonShimmer'
 import { createToast } from 'components/common/Toast'
 import { ERC20_CONTRACT_INSTANCE, OPTIONS_CONTRACT_ADDRESS, OPTIONS_CONTRACT_INSTANCE } from 'constants/contracts'
-import { BigNumber } from 'ethers'
 import { getStarknet } from 'get-starknet'
 import useIsERC721Approved from 'hooks/useIsApproved'
 import { NFTData } from 'hooks/useMyNFTs'
 import useWallet from 'hooks/useWallet'
 import withSuspense from 'hooks/withSuspense'
-import React from 'react'
+import React, { useState } from 'react'
 import { Contract, uint256 } from 'starknet'
 import { MarginProps } from 'styled-system'
-import { callContract, estimateFee, sendTransaction } from 'utils/blockchain/starknet'
-import fromBigNumber from 'utils/fromBigNumber'
+import { callContract, sendTransaction } from 'utils/blockchain/starknet'
 import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
 
 type Props = {
-  strikePrice: BigNumber
-  premium: BigNumber
+  strikePrice: string
+  premium: string
   expiryTimestamp: number
   nftData: NFTData
   isDisabled: boolean
@@ -34,14 +32,14 @@ const BuyButton = withSuspense(
     const premiumUint256 = getUint256CalldataFromBN(premium.toString())
     const isERC721Approved = useIsERC721Approved(contract_address, token_id)
 
-    console.log({ strikePriceUint256, premiumUint256, erc721_id })
-
+    const [isLoading, setIsLoading] = useState(false)
     async function handleClickApprove() {
       const erc721ContractInstance = new Contract((erc721compiledcontract as any).abi, contract_address)
       await sendTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id })
     }
 
     async function handleClickBuy() {
+      setIsLoading(true)
       /*struct ERC721PUT:
             member strike_price : Uint256
             member expiry_date : felt
@@ -67,13 +65,14 @@ const BuyButton = withSuspense(
       )
       const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0]).toNumber()
       console.log('allowance   ', existingMoneyAllowance)
-      if (existingMoneyAllowance < fromBigNumber(premium, 18)) {
+      if (existingMoneyAllowance < parseInt(premium)) {
         try {
           await sendTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
             spender: OPTIONS_CONTRACT_ADDRESS,
             amount: getUint256CalldataFromBN(100000000),
           })
         } catch (e) {
+          setIsLoading(false)
           createToast({
             description: 'Cancelled approval in wallet',
             variant: 'error',
@@ -81,8 +80,6 @@ const BuyButton = withSuspense(
           return
         }
       }
-      const fee_estmate = await estimateFee(OPTIONS_CONTRACT_INSTANCE, 'register_put_bid', paramStruct)
-      console.log({ fee_estmate })
 
       createToast({ description: 'Registering your bid now', autoClose: 5000 })
       try {
@@ -90,18 +87,22 @@ const BuyButton = withSuspense(
         console.log(`Waiting for register_put_bid Tx ${transaction_response.transaction_hash} to be Accepted `)
         await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash)
         if (onTransact) {
+          console.log('onTransact')
           onTransact()
         }
+        setIsLoading(false)
       } catch (e) {
         console.error(e)
         createToast({
           description: 'Cancelled transaction in wallet',
           variant: 'error',
         })
+        setIsLoading(false)
         return
       }
+
       createToast({
-        description: 'Success, your bid is registered, data will take a few mins to reflect in the UI',
+        description: 'Success, your bid is registered.',
         variant: 'success',
         autoClose: 5000,
       })
@@ -109,6 +110,7 @@ const BuyButton = withSuspense(
     return (
       <Button
         {...styleProps}
+        isLoading={isLoading}
         isDisabled={isERC721Approved && isDisabled}
         label={isERC721Approved ? 'Buy PUT' : 'Approve'}
         variant="primary"

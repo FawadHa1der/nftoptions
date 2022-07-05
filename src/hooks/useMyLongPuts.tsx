@@ -9,8 +9,7 @@ async function fetcher({ bids }: { bids: PutData[] }): Promise<PutDataWithNFT[]>
   const myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
   const myBids = bids.filter(
     bid =>
-      bid.seller_address === myAddress.toString(16) &&
-      (bid.status === PutStatus.ACTIVE || bid.status === PutStatus.OPEN)
+      bid.buyer_address === myAddress.toString(16) && (bid.status === PutStatus.ACTIVE || bid.status === PutStatus.OPEN)
   )
   const nfts = await Promise.all(
     myBids.map(async bid =>

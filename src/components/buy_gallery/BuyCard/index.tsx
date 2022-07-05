@@ -4,12 +4,12 @@ import Card from 'components/common/Card'
 import CardBody from 'components/common/Card/CardBody'
 import Flex from 'components/common/Flex'
 import Input from 'components/common/Input'
-import BigNumberInput from 'components/common/Input/BigNumberInput'
 import Link from 'components/common/Link'
 import Text from 'components/common/Text'
-import { ZERO_BN } from 'constants/bn'
 import BuyButton from 'containers/BuyButton'
 import { BigNumber } from 'ethers'
+import { parseUnits } from 'ethers/lib/utils'
+import useBalance from 'hooks/useBalance'
 import { NFTData } from 'hooks/useMyNFTs'
 import { ACTION_CARD_WIDTH } from 'pages'
 import React, { useMemo, useState } from 'react'
@@ -30,14 +30,17 @@ function formatToDateString(date: Date) {
 
 export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): JSX.Element {
   const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000
-  const [strikePrice, setStrikePrice] = useState<BigNumber>(ZERO_BN)
+  const balance = useBalance()
+  const [strikePrice, setStrikePrice] = useState<string>('')
   const [expiry, setExpiry] = useState<string>(formatToDateString(new Date(tomorrow)))
   const expiryTimestamp = useMemo(() => {
     return new Date(expiry).setHours(23, 59) / 1000
   }, [expiry])
-  const [premium, setPremium] = useState<BigNumber>(ZERO_BN)
+  // const [premium, setPremium] = useState<BigNumber>(ZERO_BN)
+  const [premium, setPremium] = useState<string>('')
   const expiryTooEarly = useMemo(() => expiryTimestamp < new Date().getTime() / 1000, [expiryTimestamp])
-  const isDisabled = strikePrice.isZero() || premium.isZero() || !expiry || expiryTooEarly
+  const isDisabled = isNaN(parseInt(strikePrice)) || isNaN(parseInt(premium)) || expiryTooEarly
+  // const isDisabled = strikePriceBN.isZero() || premium.isZero() || !expiry || expiryTooEarly
 
   if (!nftData) {
     return (
@@ -62,14 +65,15 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
         <Flex mt={6} flexDirection="column">
           <Flex alignItems="center">
             <Text color="light">Strike</Text>
-            <BigNumberInput
+            <Input
+              type="number"
               placeholder="0 ETH"
               width={INPUT_WIDTH}
               ml="auto"
               value={strikePrice}
-              onChange={val => setStrikePrice(val)}
+              onChange={evt => setStrikePrice(evt.target.value)}
               textAlign="right"
-            />
+            ></Input>
           </Flex>
           <Flex mt={4} alignItems="center">
             <Text color="light">Expiry</Text>
@@ -86,33 +90,39 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
           </Flex>
           <Flex mt={4} alignItems="center">
             <Text color="light">Premium</Text>
-            <BigNumberInput
+            <Input
+              type="number"
               placeholder="0 ETH"
               width={INPUT_WIDTH}
               ml="auto"
               value={premium}
-              onChange={val => setPremium(val)}
+              onChange={evt => setPremium(evt.target.value)}
               textAlign="right"
             />
           </Flex>
           <Flex mt={4} alignItems="center">
             <Text color="light">Balance</Text>
-            <AmountUpdateText ml="auto" prevAmount={ZERO_BN} newAmount={ZERO_BN} symbol="ETH" />
+            <AmountUpdateText
+              ml="auto"
+              prevAmount={BigNumber.from(balance)}
+              newAmount={parseUnits('1000', 18)}
+              symbol="ETH"
+            />
           </Flex>
           {!isDisabled ? (
             <Alert
-              mt={4}
+              mt={6}
               textAlign="center"
               label={
                 <>
                   <Text color="light" variant="secondary">
-                    I will pay {formatNumber(premium, 0)} ETH for the right to sell
+                    I will pay {formatNumber(parseInt(premium), 0)} ETH for the right to sell
                   </Text>
                   <Text color="light" variant="bodyMedium">
                     {name}
                   </Text>
                   <Text color="light" variant="secondary">
-                    For {formatNumber(strikePrice, 0)} ETH by {formatDate(expiryTimestamp, true)}
+                    For {formatNumber(parseInt(strikePrice), 0)} ETH by {formatDate(expiryTimestamp, true)}
                   </Text>
                 </>
               }

@@ -19,7 +19,7 @@ const Home = (): JSX.Element => {
           { id: 'sell', label: 'Sell PUTs' },
         ]}
       />
-      <Flex mt={8}>{selectedTab === 'buy' ? <BuyGallery /> : <SellGallery />}</Flex>
+      <Flex mt={6}>{selectedTab === 'buy' ? <BuyGallery /> : <SellGallery />}</Flex>
     </Flex>
   )
 }

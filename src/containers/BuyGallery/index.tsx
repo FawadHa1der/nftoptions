@@ -1,4 +1,5 @@
 import BuyCard from 'components/buy_gallery/BuyCard'
+import ExerciseCard from 'components/buy_gallery/ExerciseCard.tsx'
 import Box from 'components/common/Box'
 import Flex from 'components/common/Flex'
 import GalleryCard from 'components/common/GalleryCard'
@@ -7,6 +8,7 @@ import Spinner from 'components/common/Spinner'
 import Text from 'components/common/Text'
 import useMyLongPuts from 'hooks/useMyLongPuts'
 import useMyNFTs, { NFTData } from 'hooks/useMyNFTs'
+import { PutDataWithNFT } from 'hooks/usePuts'
 import withSuspense from 'hooks/withSuspense'
 import React, { useState } from 'react'
 
@@ -17,12 +19,25 @@ const BuyGallery = withSuspense(
     const [nfts, mutateMyNFTs] = useMyNFTs()
     const [myLongPuts, mutateMyLongPuts] = useMyLongPuts()
     const [selectedNFT, setSelectedNFT] = useState<NFTData | null>(null)
-
+    const [selectedLongPut, setSelectedLongPut] = useState<PutDataWithNFT | null>(null)
     const handleClickNFT = (nftData: NFTData) => {
+      setSelectedLongPut(null)
       if (selectedNFT?.token_id === nftData.token_id) {
         setSelectedNFT(null)
       } else {
         setSelectedNFT(nftData)
+      }
+    }
+
+    const handleClickLongPut = (nft: NFTData, putData?: PutDataWithNFT) => {
+      console.log({ nft, putData })
+      if (putData) {
+        setSelectedNFT(null)
+        if (selectedLongPut?.bid_id === putData.bid_id) {
+          setSelectedLongPut(null)
+        } else {
+          setSelectedLongPut(putData)
+        }
       }
     }
 
@@ -44,12 +59,18 @@ const BuyGallery = withSuspense(
                 sx={{ gridTemplateColumns: `repeat(auto-fill, minmax(240px, 1fr))`, columnGap: 6, rowGap: 6 }}
               >
                 {myLongPuts.map(put => (
-                  <GalleryCard key={put.bid_id} nftData={put.nftData} option={put} />
+                  <GalleryCard
+                    key={put.bid_id}
+                    nftData={put.nftData}
+                    option={put}
+                    onClick={handleClickLongPut}
+                    isSelected={selectedLongPut?.bid_id === put.bid_id}
+                  />
                 ))}
               </Grid>
             </Box>
           ) : null}
-          <Box width="100%">
+          <Box mt={8} width="100%">
             <Text mb={4} variant="heading">
               My NFTs
             </Text>
@@ -68,7 +89,11 @@ const BuyGallery = withSuspense(
             </Grid>
           </Box>
         </Box>
-        <BuyCard mt={50} nftData={selectedNFT} onTransact={onTransact} />
+        {selectedLongPut ? (
+          <ExerciseCard mt={50} put={selectedLongPut} />
+        ) : (
+          <BuyCard mt={50} nftData={selectedNFT} onTransact={onTransact} />
+        )}
       </Flex>
     )
   },

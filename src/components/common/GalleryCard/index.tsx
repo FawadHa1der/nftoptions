@@ -1,7 +1,8 @@
 import { GALLERY_CARD_WIDTH } from 'containers/BuyGallery'
 import useThemeColor from 'hooks/ui/useThemeColor'
-import { PutData, PutStatus } from 'hooks/useBids'
+import { PutStatus } from 'hooks/useBids'
 import { NFTData } from 'hooks/useMyNFTs'
+import { PutDataWithNFT } from 'hooks/usePuts'
 import React from 'react'
 import { MarginProps } from 'styled-system'
 import formatDate from 'utils/formatDate'
@@ -17,9 +18,9 @@ import Token from '../Token'
 
 type Props = {
   nftData: NFTData
-  option?: PutData
+  option?: PutDataWithNFT
   isSelected?: boolean
-  onClick?: (nftData: NFTData, option?: PutData) => void
+  onClick?: (nftData: NFTData, option?: PutDataWithNFT) => void
 } & MarginProps
 
 const getTokenLabel = (optionStatus: PutStatus) => {
