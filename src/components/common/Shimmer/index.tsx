@@ -1,9 +1,9 @@
-import useIsDarkMode from 'hooks/useIsDarkMode'
-import { ResponsiveValue } from 'types'
+import useIsDarkMode from 'hooks/ui/useIsDarkMode'
 import React from 'react'
 import { Box } from 'rebass'
 import styled from 'styled-components'
 import { LayoutProps, MarginProps } from 'styled-system'
+import { ResponsiveValue } from 'types'
 
 type Props = { borderRadius?: ResponsiveValue } & LayoutProps & MarginProps
 

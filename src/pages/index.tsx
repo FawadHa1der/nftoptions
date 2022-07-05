@@ -15,20 +15,16 @@ const Home = () => {
   return (
     <Flex>
       <Flex flexGrow={1} height="100%" flexDirection="column">
-        <Card>
-          <CardBody>
-            <ToggleButton
-              width={250}
-              selectedItemId={selectedTab}
-              onChange={id => setSelectedTab(id)}
-              items={[
-                { id: 'buy', label: 'Buy PUTs' },
-                { id: 'sell', label: 'Sell PUTs' },
-              ]}
-            />
-            <Flex mt={4}>{selectedTab === 'buy' ? <BuyGallery /> : <SellGallery />}</Flex>
-          </CardBody>
-        </Card>
+        <ToggleButton
+          width={250}
+          selectedItemId={selectedTab}
+          onChange={id => setSelectedTab(id)}
+          items={[
+            { id: 'buy', label: 'Buy PUTs' },
+            { id: 'sell', label: 'Sell PUTs' },
+          ]}
+        />
+        <Flex mt={4}>{selectedTab === 'buy' ? <BuyGallery /> : <SellGallery />}</Flex>
       </Flex>
       {selectedTab === 'buy' ? (
         <Card ml={6} width={ACTION_CARD_WIDTH}>
