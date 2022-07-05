@@ -1,7 +1,8 @@
-import { ChainInfo, isRejected, TransactionStatusStep } from '../';
 import { getStarknet } from "get-starknet"
 import { starknet } from "starknet"
-import { Contract, defaultProvider, stark, hash, number } from "starknet";
+import { Contract, defaultProvider, hash, number,stark } from "starknet";
+
+import { ChainInfo, isRejected, TransactionStatusStep } from '../';
 
 export const createContract = (address, ABI) => {
   return new Contract(ABI, address, getStarknet().provider);
@@ -15,6 +16,20 @@ export const callContract = async (contract, method, ...args) => {
   }
 };
 
+
+export const estimateFee = async (contract, method, args = {}) => {
+  try {
+    const calldata = stark.compileCalldata(args);
+    const transaction = {
+      contractAddress: contract.address,
+      entrypoint: method,
+      calldata
+    };
+    return await getStarknet().account.estimateFee(transaction);
+  } catch (ex) {
+    return Promise.reject(ex);
+  }
+};
 export const sendTransaction = async (contract, method, args = {}) => {
   try {
     const calldata = stark.compileCalldata(args);

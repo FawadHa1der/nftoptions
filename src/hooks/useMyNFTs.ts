@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWR, { KeyedMutator } from 'swr'
 
 import useBids, { PutData } from './useBids'
 import useWallet from './useWallet'
@@ -10,6 +10,7 @@ export interface NFTData {
   token_id: string
   image_url_copy: string
   owner: AssetOwner
+  aspect_link: string
 }
 
 export interface AssetOwner {
@@ -40,12 +41,12 @@ export async function fetcher({ url, bids }: FetcherProps): Promise<NFTData[]> {
 
 const EMPTY: NFTData[] = []
 
-export default function useMyNFTs(): NFTData[] {
+export default function useMyNFTs(): [NFTData[], KeyedMutator<NFTData[]>] {
   const address = useWallet()
   const bids = useBids()
-  const { data } = useSWR(
+  const { data, mutate } = useSWR(
     address !== null ? { url: 'https://api-testnet.aspect.co/api/v0/assets?owner_address=' + address, bids } : null,
     fetcher
   )
-  return data ?? EMPTY
+  return [data ?? EMPTY, mutate]
 }

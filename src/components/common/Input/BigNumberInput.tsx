@@ -1,9 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumberInput as BigNumberInputRaw } from 'big-number-input'
+import React, { useCallback, useEffect, useState } from 'react'
 import emptyFunction from 'utils/emptyFunction'
 import formatNumber from 'utils/formatNumber'
 import fromBigNumber from 'utils/fromBigNumber'
-import { BigNumberInput as BigNumberInputRaw } from 'big-number-input'
-import React, { useCallback, useEffect, useState } from 'react'
 
 import Input, { InputProps } from '.'
 

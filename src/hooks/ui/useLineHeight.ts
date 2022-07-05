@@ -1,5 +1,5 @@
-import theme from '../theme'
-import getVariantSX from '../utils/getVariantSX'
+import theme from 'theme'
+import getVariantSX from 'utils/getVariantSX'
 
 export default function useLineHeight(variant: string): number {
   const sx = getVariantSX(variant.startsWith('text') ? variant : 'text.' + variant)

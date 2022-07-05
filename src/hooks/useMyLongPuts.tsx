@@ -1,21 +1,33 @@
 import BN from 'bn.js'
 import { getStarknet } from 'get-starknet'
-import useSWR from 'swr'
+import useSWR, { KeyedMutator } from 'swr'
 
 import useBids, { PutData, PutStatus } from './useBids'
+import { PutDataWithNFT } from './usePuts'
 
-async function fetcher({ bids }: { bids: PutData[] }): Promise<PutData[]> {
+async function fetcher({ bids }: { bids: PutData[] }): Promise<PutDataWithNFT[]> {
   const myAddress = new BN(getStarknet().account.address.replace(/^0x/, ''), 16)
-  return bids.filter(
+  const myBids = bids.filter(
     bid =>
       bid.buyer_address === myAddress.toString(16) && (bid.status === PutStatus.ACTIVE || bid.status === PutStatus.OPEN)
   )
+  const nfts = await Promise.all(
+    myBids.map(async bid =>
+      fetch('https://api-testnet.aspect.co/api/v0/asset/0x' + bid.erc721_address + '/' + bid.erc721_id).then(res =>
+        res.json()
+      )
+    )
+  )
+  return myBids.map((bid, i) => ({
+    ...bid,
+    nftData: nfts[i],
+  }))
 }
 
 const EMPTY: PutData[] = []
 
-export default function useMyLongPuts(): PutData[] {
+export default function useMyLongPuts(): [PutData[], KeyedMutator<PutDataWithNFT[]>] {
   const bids = useBids()
-  const { data } = useSWR({ key: 'MyLongPuts', bids }, fetcher)
-  return data ?? EMPTY
+  const { data, mutate } = useSWR({ key: 'MyLongPuts', bids }, fetcher)
+  return [data ?? EMPTY, mutate]
 }

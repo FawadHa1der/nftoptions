@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import useBids, { PutData, PutStatus } from './useBids'
 import { NFTData } from './useMyNFTs'
 
-type PutDataWithNFT = PutData & {
+export type PutDataWithNFT = PutData & {
   nftData: NFTData
 }
 
