@@ -16,7 +16,7 @@ type Props = {
   nftData: NFTData
   option?: PutData
   isSelected?: boolean
-  onClick?: (nftData: NFTData) => void
+  onClick?: (nftData: NFTData, option?: PutData) => void
 } & MarginProps
 
 export default function GalleryCard({ nftData, option, onClick: handleClick, isSelected = false }: Props): JSX.Element {
@@ -26,7 +26,7 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
       minWidth={GALLERY_CARD_WIDTH}
       onClick={() => {
         if (handleClick) {
-          handleClick(nftData)
+          handleClick(nftData, option)
         }
       }}
       sx={{

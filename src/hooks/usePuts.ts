@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import useBids, { PutData, PutStatus } from './useBids'
 import { NFTData } from './useMyNFTs'
 
-type PutDataWithNFT = PutData & {
+export type PutDataWithNFT = PutData & {
   nftData: NFTData
 }
 
@@ -15,8 +15,7 @@ type FetcherProps = {
 async function fetcher({ bids }: FetcherProps): Promise<PutDataWithNFT[]> {
   const openActivePuts: PutData[] = []
   for (const bid of bids) {
-    if (bid.status === PutStatus.ACTIVE || bid.status === PutStatus.OPEN) {
-      // I am the buyer
+    if (bid.status === PutStatus.OPEN) {
       openActivePuts.push(bid)
     }
   }
@@ -38,6 +37,7 @@ const EMPTY: PutDataWithNFT[] = []
 export default function usePuts(): PutDataWithNFT[] {
   const bids = useBids()
   const { data } = useSWR({ key: 'Puts', bids }, fetcher)
+  
   console.log({ data })
   return data ?? EMPTY
 }
