@@ -51,22 +51,24 @@ export default function Alert({
       <Flex>
         {icon ? (
           <Box mr={2} minWidth={14} mt={'4px'}>
-            {typeof icon === 'string' ? <IconOrImage size={14} src={icon} /> : icon}
+            <>{typeof icon === 'string' ? <IconOrImage size={14} src={icon} /> : icon}</>
           </Box>
         ) : null}
         <Box width="100%" textAlign={textAlign}>
-          {typeof label === 'string' ? (
-            <Text variant="secondary" color="inherit">
-              {label}
-            </Text>
-          ) : (
-            label
-          )}
-          {sublabel ? (
-            <Text mt={1} color="inherit" variant="secondary">
-              {sublabel}
-            </Text>
-          ) : null}
+          <>
+            {typeof label === 'string' ? (
+              <Text variant="secondary" color="inherit">
+                {label}
+              </Text>
+            ) : (
+              label
+            )}
+            {sublabel ? (
+              <Text mt={1} color="inherit" variant="secondary">
+                {sublabel}
+              </Text>
+            ) : null}
+          </>
         </Box>
       </Flex>
     </Flex>
