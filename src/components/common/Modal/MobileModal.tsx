@@ -1,4 +1,4 @@
-import useThemeColor from 'hooks/useThemeColor'
+import useThemeColor from 'hooks/ui/useThemeColor'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ModalContext } from 'theme/ModalProvider'

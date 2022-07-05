@@ -14,6 +14,7 @@ import React, { useEffect } from 'react'
 import { Contract, json, number, uint256 } from 'starknet'
 import { sendTransaction } from 'utils/blockchain/starknet'
 import { callContract } from 'utils/blockchain/starknet'
+import { PutData } from 'hooks/useBids'
 
 import erc20compiledcontract from '../compiledcairo/erc20.json'
 import erc721compiledcontract from '../compiledcairo/erc721.json'

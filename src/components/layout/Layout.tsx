@@ -4,7 +4,7 @@ import React from 'react'
 
 import { Header } from '.'
 
-type LayoutProps = {
+export type LayoutProps = {
   children: React.ReactNode
 }
 

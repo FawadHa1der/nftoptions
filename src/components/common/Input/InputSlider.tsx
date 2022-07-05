@@ -1,8 +1,7 @@
 import { Slider } from '@rebass/forms'
 import React from 'react'
 
-import { LayoutProps, MarginProps } from '../../types'
-
+import { LayoutProps, MarginProps } from 'styled-system'
 type Props = {
   value: number
   max: number

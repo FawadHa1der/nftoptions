@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { injectStyle } from 'react-toastify/dist/inject-style'
 
-import Box from '../components/Box'
+import Box from 'components/common/Box'
 import emptyFunction from '../utils/emptyFunction'
 
 type Props = {

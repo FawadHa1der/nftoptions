@@ -1,5 +1,5 @@
-import useIsDarkMode from 'hooks/useIsDarkMode'
-import useIsMobile from 'hooks/useIsMobile'
+import useIsDarkMode from 'hooks/ui/useIsDarkMode'
+import useIsMobile from 'hooks/ui/useIsMobile'
 import React from 'react'
 import ReactModal from 'react-modal'
 import theme from 'theme'

@@ -1,4 +1,4 @@
-import Text, { TextProps } from 'components/Text'
+import Text, { TextProps } from 'components/common/Text'
 import React, { useEffect, useState } from 'react'
 import { LayoutProps, MarginProps } from 'styled-system'
 import formatDuration from 'utils/formatDuration'

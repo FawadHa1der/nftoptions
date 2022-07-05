@@ -1,6 +1,6 @@
 import { getStarknet } from "get-starknet"
 import { starknet } from "starknet"
-import { Contract, defaultProvider, hash, number,stark } from "starknet";
+import { Contract, defaultProvider, hash, number, stark } from "starknet";
 
 import { ChainInfo, isRejected, TransactionStatusStep } from '../';
 
@@ -43,6 +43,22 @@ export const sendTransaction = async (contract, method, args = {}) => {
     return Promise.reject(ex);
   }
 };
+
+// not properly implemented yet
+export const sendTransactions = async (contract, method, args = {}) => {
+  try {
+    const calldata = stark.compileCalldata(args);
+    const transaction = {
+      contractAddress: contract.address,
+      entrypoint: method,
+      calldata
+    };
+    return await getStarknet().account.execute(transaction);
+  } catch (ex) {
+    return Promise.reject(ex);
+  }
+};
+
 
 export const waitForTransaction = async (transactionHash, requiredStatus, retryInterval = 5000) => {
   return new Promise((resolve, reject) => {

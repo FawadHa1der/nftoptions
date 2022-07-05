@@ -68,7 +68,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               width={INPUT_WIDTH}
               ml="auto"
               value={strikePrice}
-              onChange={evt => setStrikePrice(evt.target.value)}
+              onChange={(evt: any) => setStrikePrice(evt.target.value)}
               textAlign="right"
             ></Input>
           </Flex>
@@ -82,7 +82,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               width={INPUT_WIDTH}
               type="date"
               value={expiry}
-              onChange={evt => setExpiry(evt.target.value)}
+              onChange={(evt: any) => setExpiry(evt.target.value)}
             />
           </Flex>
           <Flex mt={4} alignItems="center">
@@ -93,7 +93,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               width={INPUT_WIDTH}
               ml="auto"
               value={premium}
-              onChange={evt => setPremium(evt.target.value)}
+              onChange={(evt: any) => setPremium(evt.target.value)}
               textAlign="right"
             />
           </Flex>

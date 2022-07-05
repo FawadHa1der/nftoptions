@@ -1,6 +1,6 @@
 import { BigNumberish } from '@ethersproject/bignumber'
-import IconButton from 'components/Button/IconButton'
-import Icon, { IconType } from 'components/Icon'
+import IconButton from 'components/common/Button/IconButton'
+import Icon, { IconType } from 'components/common/Icon'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Cell, CellProps, Column, Row, useFlexLayout, useRowState, useSortBy, useTable } from 'react-table'
 import { Box, Flex } from 'rebass'

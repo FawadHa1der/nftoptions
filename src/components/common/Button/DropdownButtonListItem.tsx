@@ -1,4 +1,4 @@
-import useIsMobile from 'hooks/useIsMobile'
+import useIsMobile from 'hooks/ui/useIsMobile'
 import React from 'react'
 
 import ListItem, { ListItemProps } from '../List/ListItem'

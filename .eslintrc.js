@@ -16,7 +16,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-inferrable-types': 0,
     'react/display-name': 'warn',
-    'simple-import-sort/imports': 'error',
+    'simple-import-sort/imports': 'warn',
     'no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': [
