@@ -69,8 +69,8 @@ export default function SellCard({ put, ...styleProps }: Props): JSX.Element {
                 {nftData.name}
               </Text>
               <Text color="light" variant="secondary">
-                For {formatNumber(parseInt(strike_price), 0)} ETH and will receive {formatNumber(parseInt(premium), 0)}{' '}
-                ETH for the agreement
+                For {formatNumber(parseInt(strike_price), 0)} TT and will receive {formatNumber(parseInt(premium), 0)}{' '}
+                TT for the agreement
               </Text>
             </>
           }

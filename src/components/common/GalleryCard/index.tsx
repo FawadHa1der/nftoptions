@@ -89,14 +89,14 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
         {option ? (
           <Flex flexDirection="column">
             <Text variant="secondary" color="light">
-              {formatNumber(parseInt(option.strike_price), 0)} ETH PUT
+              {formatNumber(parseInt(option.strike_price), 0)} TT PUT
             </Text>
             <Text variant="secondary" color="light">
               Exp. {formatDate(parseInt(option.expiry_date), true)}{' '}
             </Text>
             <Flex mt={4}>
               <Token label={getTokenLabel(option.status)} variant={getTokenVariant(option.status)} />
-              <Token ml={2} label={`${formatNumber(parseInt(option.premium), 1)} ETH`} variant="primary" />
+              <Token ml={2} label={`${formatNumber(parseInt(option.premium), 1)} TT`} variant="primary" />
             </Flex>
           </Flex>
         ) : (

@@ -74,7 +74,7 @@ export default function ExerciseCard({ put, ...styleProps }: Props): JSX.Element
                 {nftData.name}
               </Text>
               <Text color="light" variant="secondary">
-                For {formatNumber(parseInt(strike_price), 0)} ETH
+                For {formatNumber(parseInt(strike_price), 0)} TT
               </Text>
             </>
           }

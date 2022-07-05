@@ -64,7 +64,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
             <Text color="light">Strike</Text>
             <Input
               type="number"
-              placeholder="0 ETH"
+              placeholder="0 TT"
               width={INPUT_WIDTH}
               ml="auto"
               value={strikePrice}
@@ -89,7 +89,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
             <Text color="light">Premium</Text>
             <Input
               type="number"
-              placeholder="0 ETH"
+              placeholder="0 TT"
               width={INPUT_WIDTH}
               ml="auto"
               value={premium}
@@ -113,13 +113,13 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               label={
                 <>
                   <Text color="light" variant="secondary">
-                    I will pay {formatNumber(parseInt(premium), 0)} ETH for the right to sell
+                    I will pay {formatNumber(parseInt(premium), 0)} TT for the right to sell
                   </Text>
                   <Text color="light" variant="bodyMedium">
                     {name}
                   </Text>
                   <Text color="light" variant="secondary">
-                    For {formatNumber(parseInt(strikePrice), 0)} ETH by {formatDate(expiryTimestamp, true)}
+                    For {formatNumber(parseInt(strikePrice), 0)} TT by {formatDate(expiryTimestamp, true)}
                   </Text>
                 </>
               }

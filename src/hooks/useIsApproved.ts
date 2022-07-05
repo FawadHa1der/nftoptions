@@ -14,7 +14,9 @@ async function fetcher(key: string, owner: string, contractAddress: string, toke
   try {
     const approvedResult = await callContract(erc721ContractInstance, 'getApproved', erc721_id)
     const approvedAddress = approvedResult[0]
-    return approvedAddress !== '0' && OPTIONS_CONTRACT_ADDRESS.includes(approvedAddress.toString(16))
+    console.log('this is fetcher return value ' + (approvedAddress.toString() != '0' && OPTIONS_CONTRACT_ADDRESS.includes(approvedAddress.toString(16))))
+
+    return approvedAddress.toString() != '0' && OPTIONS_CONTRACT_ADDRESS.includes(approvedAddress.toString(16))
   } catch {
     return false
   }
