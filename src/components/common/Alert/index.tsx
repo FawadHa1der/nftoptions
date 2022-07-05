@@ -54,10 +54,14 @@ export default function Alert({
             {typeof icon === 'string' ? <IconOrImage size={14} src={icon} /> : icon}
           </Box>
         ) : null}
-        <Box textAlign={textAlign}>
-          <Text variant="secondary" color="inherit">
-            {label}
-          </Text>
+        <Box width="100%" textAlign={textAlign}>
+          {typeof label === 'string' ? (
+            <Text variant="secondary" color="inherit">
+              {label}
+            </Text>
+          ) : (
+            label
+          )}
           {sublabel ? (
             <Text mt={1} color="inherit" variant="secondary">
               {sublabel}

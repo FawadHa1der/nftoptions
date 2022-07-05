@@ -1,10 +1,9 @@
+import { OPTIONS_CONTRACT_ADDRESS } from 'constants/contracts'
 import { uint256 } from 'starknet'
 import useSWR from 'swr'
 import { callContract, createContract } from 'utils/blockchain/starknet'
 
 import optionsCompiledContract from '../compiledcairo/erc721_option.json'
-
-const OPTIONS_CONTRACT_ADDRESS = '0x02e6a26d2fcb7256934c822ad8a81ee40aed922b271495d8eb1e05d031192f52'
 
 export interface PutData {
   strike_price: string
