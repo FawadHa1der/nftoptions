@@ -52,10 +52,10 @@ export default function SellCard({ put, ...styleProps }: Props): JSX.Element {
             <Text color="light">Premium</Text>
             <Text ml="auto">{formatNumber(parseInt(premium))}</Text>
           </Flex>
-          <Flex mt={4} alignItems="center">
+          {/* <Flex mt={4} alignItems="center">
             <Text color="light">Balance</Text>
             <Text ml="auto">{0} ETH</Text>
-          </Flex>
+          </Flex> */}
         </Flex>
         <Alert
           mt={6}

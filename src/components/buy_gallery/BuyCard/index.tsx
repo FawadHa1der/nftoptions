@@ -1,5 +1,4 @@
 import Alert from 'components/common/Alert'
-import AmountUpdateText from 'components/common/AmountUpdateText'
 import Card from 'components/common/Card'
 import CardBody from 'components/common/Card/CardBody'
 import Flex from 'components/common/Flex'
@@ -7,8 +6,6 @@ import Input from 'components/common/Input'
 import Link from 'components/common/Link'
 import Text from 'components/common/Text'
 import BuyButton from 'containers/BuyButton'
-import { BigNumber } from 'ethers'
-import { parseUnits } from 'ethers/lib/utils'
 import useBalance from 'hooks/useBalance'
 import { NFTData } from 'hooks/useMyNFTs'
 import { ACTION_CARD_WIDTH } from 'pages'
@@ -100,7 +97,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               textAlign="right"
             />
           </Flex>
-          <Flex mt={4} alignItems="center">
+          {/* <Flex mt={4} alignItems="center">
             <Text color="light">Balance</Text>
             <AmountUpdateText
               ml="auto"
@@ -108,7 +105,7 @@ export default function BuyCard({ nftData, onTransact, ...styleProps }: Props): 
               newAmount={parseUnits('1000', 18)}
               symbol="ETH"
             />
-          </Flex>
+          </Flex> */}
           {!isDisabled ? (
             <Alert
               mt={6}
