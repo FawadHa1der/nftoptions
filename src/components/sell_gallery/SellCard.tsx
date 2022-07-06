@@ -97,7 +97,7 @@ const SellCard = withSuspense(
   },
   ({ put, onTransact, ...styleProps }: Props) => (
     <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} height={368}>
-      <CardBody>
+      <CardBody height="100%">
         <Text mx="auto" variant="heading">
           Select a PUT
         </Text>

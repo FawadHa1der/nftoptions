@@ -149,7 +149,7 @@ const BuyCard = withSuspense(
   },
   ({ nftData, onTransact, ...styleProps }: Props) => (
     <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} height={400}>
-      <CardBody>
+      <CardBody height="100%">
         <Text mx="auto" variant="heading">
           Select an NFT or PUT
         </Text>

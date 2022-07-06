@@ -114,8 +114,8 @@ const ExerciseCard = withSuspense(
   },
   ({ put, ...styleProps }: Props) => (
     <Card {...styleProps} width={ACTION_CARD_WIDTH} height="max-content">
-      <CardBody>
-        <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
+      <CardBody height="100%">
+        <Flex height="100%" width="100%" flexDirection="column" justifyContent="center" alignItems="center">
           <Spinner />
         </Flex>
       </CardBody>
