@@ -40,7 +40,7 @@ const SellCard = withSuspense(
 
     const { nftData, strike_price, expiry_date, premium } = put
     return (
-      <Card {...styleProps} width={ACTION_CARD_WIDTH} height="max-content">
+      <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} width={ACTION_CARD_WIDTH} height="max-content">
         <CardBody>
           <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
             <Text variant="heading">Sell PUT for</Text>

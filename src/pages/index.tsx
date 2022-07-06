@@ -9,7 +9,7 @@ export const ACTION_CARD_WIDTH = 340
 const Home = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState('buy')
   return (
-    <Flex flexGrow={1} height="100%" flexDirection="column" mt={8}>
+    <Flex flexGrow={1} height="100%" flexDirection="column">
       <ToggleButton
         width={250}
         selectedItemId={selectedTab}

@@ -16,23 +16,28 @@ import withSuspense from 'hooks/withSuspense'
 import { ACTION_CARD_WIDTH } from 'pages'
 import React, { useState } from 'react'
 import { MarginProps } from 'styled-system'
-import { sendTransaction } from 'utils/blockchain/starknet'
+import { sendTransaction, waitForTransaction } from 'utils/blockchain/starknet'
 import formatDate from 'utils/formatDate'
 import formatUSD from 'utils/formatUSD'
 
 type Props = {
   put: PutDataWithNFT
+  onTransact?: () => void
 } & MarginProps
 
 const ExerciseCard = withSuspense(
-  ({ put, ...styleProps }: Props) => {
+  ({ put, onTransact, ...styleProps }: Props) => {
     const [isLoading, setIsLoading] = useState(false)
     const balance = useBalance()
     const handleClickExercise = async () => {
       setIsLoading(true)
       try {
-        await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'exercise_put', { bid_id: put.bid_id })
+        const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'exercise_put', { bid_id: put.bid_id })
+        await waitForTransaction(tx.transaction_hash)
         setIsLoading(false)
+        if (onTransact) {
+          onTransact()
+        }
       } catch (e) {
         console.error(e)
         setIsLoading(false)
@@ -45,7 +50,7 @@ const ExerciseCard = withSuspense(
     const { nftData, strike_price, expiry_date, premium } = put
 
     return (
-      <Card {...styleProps} width={ACTION_CARD_WIDTH} height="max-content">
+      <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} width={ACTION_CARD_WIDTH} height="max-content">
         <CardBody>
           <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
             <Text variant="heading">Sell PUT for</Text>

@@ -56,7 +56,7 @@ const BuyCard = withSuspense(
     const { name, aspect_link } = nftData
 
     return (
-      <Card {...styleProps} width={ACTION_CARD_WIDTH} height="max-content">
+      <Card {...styleProps} minWidth={ACTION_CARD_WIDTH} width={ACTION_CARD_WIDTH} height="max-content">
         <CardBody>
           <Flex width="100%" flexDirection="column" justifyContent="center" alignItems="center">
             <Text variant="heading">Buy PUT for</Text>

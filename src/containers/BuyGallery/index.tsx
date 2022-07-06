@@ -50,7 +50,7 @@ const BuyGallery = withSuspense(
         <Box flexGrow={1} mr={6}>
           {myLongPuts.length > 0 ? (
             <Box mb={8}>
-              <Text mb={4} variant="heading">
+              <Text ml={6} mb={4} variant="heading">
                 My Puts
               </Text>
               <Grid
@@ -70,7 +70,7 @@ const BuyGallery = withSuspense(
             </Box>
           ) : null}
           <Box width="100%">
-            <Text mb={4} variant="heading">
+            <Text ml={6} mb={4} variant="heading">
               My NFTs
             </Text>
             <Grid
@@ -89,9 +89,9 @@ const BuyGallery = withSuspense(
           </Box>
         </Box>
         {selectedLongPut ? (
-          <ExerciseCard mt={50} put={selectedLongPut} />
+          <ExerciseCard mt={-64} put={selectedLongPut} />
         ) : (
-          <BuyCard mt={50} nftData={selectedNFT} onTransact={onTransact} />
+          <BuyCard mt={-64} nftData={selectedNFT} onTransact={onTransact} />
         )}
       </Flex>
     )

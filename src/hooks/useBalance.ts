@@ -20,6 +20,6 @@ const EMPTY = 0
 
 export default function useBalance(): number {
   const address = useWallet()
-  const { data } = useSWR(['Balance', address], fetcher)
+  const { data } = useSWR(['Balance', address], fetcher, { refreshInterval: 150000 })
   return data ?? EMPTY
 }
