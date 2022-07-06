@@ -6,7 +6,6 @@ import { PutDataWithNFT } from 'hooks/usePuts'
 import React from 'react'
 import { MarginProps } from 'styled-system'
 import formatDate from 'utils/formatDate'
-import formatNumber from 'utils/formatNumber'
 import formatUSD from 'utils/formatUSD'
 
 import Card from '../Card'
@@ -94,7 +93,7 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
             </Text>
             <Flex mt={4}>
               <Token label={getTokenLabel(option.status)} variant={getTokenVariant(option.status)} />
-              <Token ml={2} label={`${formatNumber(parseInt(option.premium), 1)} TT`} variant="primary" />
+              <Token ml={2} label={formatUSD(parseInt(option.premium))} variant="primary" />
             </Flex>
           </Flex>
         ) : (
