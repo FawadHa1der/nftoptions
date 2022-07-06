@@ -8,6 +8,7 @@ import { MarginProps } from 'styled-system'
 import formatDate from 'utils/formatDate'
 import formatUSD from 'utils/formatUSD'
 
+import Box from '../Box'
 import Card from '../Card'
 import CardBody from '../Card/CardBody'
 import Flex from '../Flex'
@@ -68,20 +69,22 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
             justifyContent="center"
             alignItems="center"
             width="100%"
-            height="100%"
             sx={{
               position: 'absolute',
               top: 0,
-              left: 0,
               background: background + '80',
               transition: 'opacity 0.15s ease-out',
               backdropFilter: 'blur(4px)',
               opacity: isSelected ? 1 : 0,
+              borderRadius: 20,
+              aspectRatio: '1 / 1',
             }}
           >
             <Icon color="primary" icon={IconType.Check} size={80} />
           </Flex>
-          <Image src={nftData.image_url_copy} size={180} />
+          <Box sx={{ borderRadius: 20, aspectRatio: '1 / 1' }} overflow="hidden" width="100%">
+            <Image src={nftData.image_url_copy} height="100%" width="100%" sx={{ objectFit: 'cover' }} />
+          </Box>
         </Flex>
         <Text my={3} variant="bodyMedium">
           {nftData.name}

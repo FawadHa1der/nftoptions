@@ -30,7 +30,7 @@ const SellGallery = withSuspense(
         <Box flexGrow={1} mr={6}>
           {myPuts.length > 0 ? (
             <Box mb={8}>
-              <Text mb={4} variant="heading">
+              <Text ml={6} mb={4} variant="heading">
                 My Puts
               </Text>
               <Grid
@@ -44,7 +44,7 @@ const SellGallery = withSuspense(
             </Box>
           ) : null}
           <Box width="100%">
-            <Text mb={4} variant="heading">
+            <Text ml={6} mb={4} variant="heading">
               Offers
             </Text>
             <Grid
@@ -64,7 +64,7 @@ const SellGallery = withSuspense(
           </Box>
         </Box>
         <SellCard
-          mt={50}
+          mt={-64}
           put={selectedOpenPut}
           onTransact={() => {
             mutatePuts()
