@@ -1,6 +1,6 @@
 import useSWR, { KeyedMutator } from 'swr'
 
-import useBids, { PutData } from './useBids'
+import useBids, { PutData, PutStatus } from './useBids'
 import useWallet from './useWallet'
 
 export interface NFTData {
@@ -36,7 +36,7 @@ export async function fetcher({ url, bids }: FetcherProps): Promise<NFTData[]> {
     .then(data => data.assets)
     .catch(() => [])
   // Filter out NFTs with open bids
-  return nfts.filter(nft => !tokenIdToBid[nft.token_id])
+  return nfts.filter(nft => !tokenIdToBid[nft.token_id] || tokenIdToBid[nft.token_id].status === PutStatus.CLOSED)
 }
 
 const EMPTY: NFTData[] = []
