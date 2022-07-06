@@ -7,6 +7,7 @@ import React from 'react'
 import { MarginProps } from 'styled-system'
 import formatDate from 'utils/formatDate'
 import formatNumber from 'utils/formatNumber'
+import formatUSD from 'utils/formatUSD'
 
 import Card from '../Card'
 import CardBody from '../Card/CardBody'
@@ -89,10 +90,7 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
         {option ? (
           <Flex flexDirection="column">
             <Text variant="secondary" color="light">
-              {formatNumber(parseInt(option.strike_price), 0)} TT PUT
-            </Text>
-            <Text variant="secondary" color="light">
-              Exp. {formatDate(parseInt(option.expiry_date), true)}{' '}
+              {formatUSD(parseInt(option.strike_price), 0)} PUT Exp. {formatDate(parseInt(option.expiry_date), true)}
             </Text>
             <Flex mt={4}>
               <Token label={getTokenLabel(option.status)} variant={getTokenVariant(option.status)} />

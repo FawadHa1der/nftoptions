@@ -2,6 +2,7 @@ import useSWR, { KeyedMutator } from 'swr'
 
 import useBids, { PutData, PutStatus } from './useBids'
 import { NFTData } from './useMyNFTs'
+import useWallet from './useWallet'
 
 export type PutDataWithNFT = PutData & {
   nftData: NFTData
@@ -10,15 +11,14 @@ export type PutDataWithNFT = PutData & {
 type FetcherProps = {
   key: string
   bids: PutData[]
+  address: string | null
 }
 
-async function fetcher({ bids }: FetcherProps): Promise<PutDataWithNFT[]> {
-  const openActivePuts: PutData[] = []
-  for (const bid of bids) {
-    if (bid.status === PutStatus.OPEN) {
-      openActivePuts.push(bid)
-    }
-  }
+async function fetcher({ bids, address }: FetcherProps): Promise<PutDataWithNFT[]> {
+  const openActivePuts: PutData[] = bids.filter(
+    bid => bid.status === PutStatus.OPEN && (!address || bid.buyer_address !== address.replace('0x', ''))
+  )
+
   const nfts = await Promise.all(
     openActivePuts.map(async bid =>
       fetch('https://api-testnet.aspect.co/api/v0/asset/0x' + bid.erc721_address + '/' + bid.erc721_id).then(res =>
@@ -35,7 +35,8 @@ async function fetcher({ bids }: FetcherProps): Promise<PutDataWithNFT[]> {
 const EMPTY: PutDataWithNFT[] = []
 
 export default function usePuts(): [PutDataWithNFT[], KeyedMutator<PutDataWithNFT[]>] {
+  const address = useWallet()
   const bids = useBids()
-  const { data, mutate } = useSWR({ key: 'Puts', bids }, fetcher)
+  const { data, mutate } = useSWR({ key: 'Puts', bids, address }, fetcher)
   return [data ?? EMPTY, mutate]
 }

@@ -15,7 +15,7 @@ import { ACTION_CARD_WIDTH } from 'pages'
 import React, { useMemo, useState } from 'react'
 import { MarginProps } from 'types'
 import formatDate from 'utils/formatDate'
-import formatNumber from 'utils/formatNumber'
+import formatUSD from 'utils/formatUSD'
 
 const INPUT_WIDTH = 160
 
@@ -116,13 +116,13 @@ const BuyCard = withSuspense(
                 label={
                   <>
                     <Text color="light" variant="secondary">
-                      I will pay {formatNumber(parseInt(premium), 0)} TT for the right to sell
+                      I will pay {formatUSD(parseInt(premium), 0)} for the right to sell
                     </Text>
                     <Text color="light" variant="bodyMedium">
                       {name}
                     </Text>
                     <Text color="light" variant="secondary">
-                      For {formatNumber(parseInt(strikePrice), 0)} TT by {formatDate(expiryTimestamp, true)}
+                      For {formatUSD(parseInt(strikePrice), 0)} by {formatDate(expiryTimestamp, true)}
                     </Text>
                   </>
                 }
