@@ -21,6 +21,5 @@ const EMPTY = 0
 export default function useBalance(): number {
   const address = useWallet()
   const { data } = useSWR(['Balance', address], fetcher)
-  console.log({ data })
   return data ?? EMPTY
 }

@@ -35,7 +35,11 @@ const BuyButton = withSuspense(
     const [isLoading, setIsLoading] = useState(false)
     async function handleClickApprove() {
       const erc721ContractInstance = new Contract((erc721compiledcontract as any).abi, contract_address)
-      await sendTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id })
+      try {
+        await sendTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id })
+      } catch {
+        return
+      }
     }
 
     async function handleClickBuy() {
@@ -75,7 +79,6 @@ const BuyButton = withSuspense(
       )
 
       const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0])
-      console.log('allowance   ', existingMoneyAllowance)
       if (existingMoneyAllowance.ltn(parseInt(premium))) {
         try {
           await sendTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {

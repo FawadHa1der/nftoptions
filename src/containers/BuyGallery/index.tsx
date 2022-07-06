@@ -30,7 +30,6 @@ const BuyGallery = withSuspense(
     }
 
     const handleClickLongPut = (nft: NFTData, putData?: PutDataWithNFT) => {
-      console.log({ nft, putData })
       if (putData) {
         setSelectedNFT(null)
         if (selectedLongPut?.bid_id === putData.bid_id) {
