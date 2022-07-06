@@ -15,7 +15,7 @@ import { ACTION_CARD_WIDTH } from 'pages'
 import React from 'react'
 import { MarginProps } from 'types'
 import formatDate from 'utils/formatDate'
-import formatNumber from 'utils/formatNumber'
+import formatUSD from 'utils/formatUSD'
 
 type Props = {
   put: PutDataWithNFT | null
@@ -49,7 +49,7 @@ const SellCard = withSuspense(
           <Flex mt={6} flexDirection="column">
             <Flex alignItems="center">
               <Text color="light">Strike</Text>
-              <Text ml="auto">{strike_price}</Text>
+              <Text ml="auto">{formatUSD(parseInt(strike_price))}</Text>
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Expiry</Text>
@@ -57,13 +57,13 @@ const SellCard = withSuspense(
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Premium</Text>
-              <Text ml="auto">{formatNumber(parseInt(premium))}</Text>
+              <Text ml="auto">{formatUSD(parseInt(premium))}</Text>
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Balance</Text>
               <AmountUpdateText
                 ml="auto"
-                symbol="TT"
+                isUSDFormat
                 prevAmount={balance}
                 newAmount={balance - parseInt(strike_price) + parseInt(premium)}
               ></AmountUpdateText>
@@ -81,8 +81,8 @@ const SellCard = withSuspense(
                   {nftData.name}
                 </Text>
                 <Text color="light" variant="secondary">
-                  For {formatNumber(parseInt(strike_price), 0)} TT and will receive {formatNumber(parseInt(premium), 0)}{' '}
-                  TT for the agreement
+                  For {formatUSD(parseInt(strike_price), 0)} and will receive {formatUSD(parseInt(premium), 0)} for the
+                  agreement
                 </Text>
               </>
             }

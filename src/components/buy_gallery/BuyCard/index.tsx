@@ -66,8 +66,9 @@ const BuyCard = withSuspense(
             <Flex alignItems="center">
               <Text color="light">Strike</Text>
               <Input
+                icon="$"
                 type="number"
-                placeholder="0 TT"
+                placeholder="0"
                 width={INPUT_WIDTH}
                 ml="auto"
                 value={strikePrice}
@@ -91,8 +92,9 @@ const BuyCard = withSuspense(
             <Flex mt={4} alignItems="center">
               <Text color="light">Premium</Text>
               <Input
+                icon="$"
                 type="number"
-                placeholder="0 TT"
+                placeholder="0"
                 width={INPUT_WIDTH}
                 ml="auto"
                 value={premium}
@@ -106,7 +108,7 @@ const BuyCard = withSuspense(
                 ml="auto"
                 prevAmount={balance}
                 newAmount={isNaN(parseInt(premium)) ? balance : balance - parseInt(premium)}
-                symbol="TT"
+                isUSDFormat
               />
             </Flex>
             {!isDisabled ? (

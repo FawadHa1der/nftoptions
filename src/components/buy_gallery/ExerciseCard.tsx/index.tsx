@@ -18,7 +18,7 @@ import React, { useState } from 'react'
 import { MarginProps } from 'styled-system'
 import { sendTransaction } from 'utils/blockchain/starknet'
 import formatDate from 'utils/formatDate'
-import formatNumber from 'utils/formatNumber'
+import formatUSD from 'utils/formatUSD'
 
 type Props = {
   put: PutDataWithNFT
@@ -54,7 +54,7 @@ const ExerciseCard = withSuspense(
           <Flex mt={6} flexDirection="column">
             <Flex alignItems="center">
               <Text color="light">Strike</Text>
-              <Text ml="auto">{strike_price}</Text>
+              <Text ml="auto">{formatUSD(parseInt(strike_price))}</Text>
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Expiry</Text>
@@ -62,11 +62,16 @@ const ExerciseCard = withSuspense(
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Premium</Text>
-              <Text ml="auto">{formatNumber(parseInt(premium))}</Text>
+              <Text ml="auto">{formatUSD(parseInt(premium))}</Text>
             </Flex>
             <Flex mt={4} alignItems="center">
               <Text color="light">Balance</Text>
-              <AmountUpdateText ml="auto" prevAmount={balance} newAmount={balance + parseInt(strike_price)} />
+              <AmountUpdateText
+                ml="auto"
+                isUSDFormat={true}
+                prevAmount={balance}
+                newAmount={balance + parseInt(strike_price)}
+              />
             </Flex>
           </Flex>
           <Alert
@@ -81,7 +86,7 @@ const ExerciseCard = withSuspense(
                   {nftData.name}
                 </Text>
                 <Text color="light" variant="secondary">
-                  For {formatNumber(parseInt(strike_price), 0)} TT
+                  For {formatUSD(parseInt(strike_price), 0)}
                 </Text>
               </>
             }
