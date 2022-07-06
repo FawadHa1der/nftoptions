@@ -13,27 +13,15 @@ import React, { useState } from 'react'
 
 const SellGallery = withSuspense(
   () => {
-    const puts = usePuts()
-    const myPuts = useMyShortPuts()
+    const [puts, mutatePuts] = usePuts()
+    const [myPuts, mutateMyShortPuts] = useMyShortPuts()
     const [selectedOpenPut, setSelectedOpenPut] = useState<PutDataWithNFT | null>(null)
-    const [selectedFilledPut, setSelectedFilledPut] = useState<PutDataWithNFT | null>(null)
+
     const handleClickNFT = (nftData: NFTData, option: any) => {
-      setSelectedFilledPut(null)
       if (selectedOpenPut?.nftData.token_id === nftData.token_id) {
         setSelectedOpenPut(null)
       } else {
         setSelectedOpenPut(nftData && option)
-      }
-    }
-
-    const handleClickShortPut = (nft: NFTData, putData?: PutDataWithNFT) => {
-      if (putData) {
-        setSelectedOpenPut(null)
-        if (selectedFilledPut?.bid_id === putData.bid_id) {
-          setSelectedFilledPut(null)
-        } else {
-          setSelectedFilledPut(putData)
-        }
       }
     }
 
@@ -50,13 +38,7 @@ const SellGallery = withSuspense(
                 sx={{ gridTemplateColumns: `repeat(auto-fill, minmax(240px, 1fr))`, columnGap: 6, rowGap: 6 }}
               >
                 {myPuts.map(put => (
-                  <GalleryCard
-                    key={put.bid_id}
-                    nftData={put.nftData}
-                    option={put}
-                    onClick={handleClickShortPut}
-                    isSelected={selectedFilledPut?.bid_id === put.bid_id}
-                  />
+                  <GalleryCard key={put.bid_id} nftData={put.nftData} option={put} />
                 ))}
               </Grid>
             </Box>
@@ -81,7 +63,14 @@ const SellGallery = withSuspense(
             </Grid>
           </Box>
         </Box>
-        <SellCard mt={50} put={selectedOpenPut} />
+        <SellCard
+          mt={50}
+          put={selectedOpenPut}
+          onTransact={() => {
+            mutatePuts()
+            mutateMyShortPuts()
+          }}
+        />
       </Flex>
     )
   },

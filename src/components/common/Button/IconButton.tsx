@@ -53,7 +53,7 @@ const IconButton = React.forwardRef(
           p={0}
           minWidth={sx.height}
         >
-          {typeof icon === 'string' ? <IconOrImage src={icon} size={getButtonIconSize(size)} /> : icon}
+          <>{typeof icon === 'string' ? <IconOrImage src={icon} size={getButtonIconSize(size)} /> : icon}</>
         </RebassButton>
       </NextLink>
     )

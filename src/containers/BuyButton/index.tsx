@@ -4,7 +4,7 @@ import ButtonShimmer from 'components/common/Shimmer/ButtonShimmer'
 import { createToast } from 'components/common/Toast'
 import { ERC20_CONTRACT_INSTANCE, OPTIONS_CONTRACT_ADDRESS, OPTIONS_CONTRACT_INSTANCE } from 'constants/contracts'
 import { getStarknet } from 'get-starknet'
-import useIsERC721Approved from 'hooks/useIsApproved'
+import useIsERC721Approved from 'hooks/useIsERC721Approved'
 import { NFTData } from 'hooks/useMyNFTs'
 import useWallet from 'hooks/useWallet'
 import withSuspense from 'hooks/withSuspense'
@@ -13,7 +13,6 @@ import { Contract, uint256 } from 'starknet'
 import { MarginProps } from 'styled-system'
 import { callContract, sendTransaction } from 'utils/blockchain/starknet'
 import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
-import { BN } from 'bn.js'
 
 type Props = {
   strikePrice: string
@@ -57,11 +56,7 @@ const BuyButton = withSuspense(
         d: erc721_id,
         e: premiumUint256,
       }
-      const balanceResult = await callContract(
-        ERC20_CONTRACT_INSTANCE,
-        'balanceOf',
-        address
-      )
+      const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
       const existingBalance = uint256.uint256ToBN(balanceResult[0])
       if (existingBalance.ltn(parseInt(premium))) {
