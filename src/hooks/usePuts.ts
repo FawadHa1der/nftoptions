@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWR, { KeyedMutator } from 'swr'
 
 import useBids, { PutData, PutStatus } from './useBids'
 import { NFTData } from './useMyNFTs'
@@ -34,10 +34,8 @@ async function fetcher({ bids }: FetcherProps): Promise<PutDataWithNFT[]> {
 
 const EMPTY: PutDataWithNFT[] = []
 
-export default function usePuts(): PutDataWithNFT[] {
+export default function usePuts(): [PutDataWithNFT[], KeyedMutator<PutDataWithNFT[]>] {
   const bids = useBids()
-  const { data } = useSWR({ key: 'Puts', bids }, fetcher)
-
-  console.log({ data })
-  return data ?? EMPTY
+  const { data, mutate } = useSWR({ key: 'Puts', bids }, fetcher)
+  return [data ?? EMPTY, mutate]
 }

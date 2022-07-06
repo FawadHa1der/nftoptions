@@ -30,7 +30,6 @@ const BuyGallery = withSuspense(
     }
 
     const handleClickLongPut = (nft: NFTData, putData?: PutDataWithNFT) => {
-      console.log({ nft, putData })
       if (putData) {
         setSelectedNFT(null)
         if (selectedLongPut?.bid_id === putData.bid_id) {
@@ -50,7 +49,7 @@ const BuyGallery = withSuspense(
       <Flex width="100%">
         <Box flexGrow={1} mr={6}>
           {myLongPuts.length > 0 ? (
-            <Box>
+            <Box mb={8}>
               <Text mb={4} variant="heading">
                 My Puts
               </Text>
@@ -70,7 +69,7 @@ const BuyGallery = withSuspense(
               </Grid>
             </Box>
           ) : null}
-          <Box mt={8} width="100%">
+          <Box width="100%">
             <Text mb={4} variant="heading">
               My NFTs
             </Text>

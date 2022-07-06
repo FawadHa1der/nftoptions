@@ -1,6 +1,6 @@
 import BN from 'bn.js'
 import { getStarknet } from 'get-starknet'
-import useSWR from 'swr'
+import useSWR, { KeyedMutator } from 'swr'
 
 import useBids, { PutData, PutStatus } from './useBids'
 import { PutDataWithNFT } from './usePuts'
@@ -25,9 +25,8 @@ async function fetcher({ bids }: { bids: PutData[] }): Promise<PutDataWithNFT[]>
 
 const EMPTY: PutDataWithNFT[] = []
 
-export default function useMyShortPuts(): PutDataWithNFT[] {
+export default function useMyShortPuts(): [PutDataWithNFT[], KeyedMutator<PutDataWithNFT[]>] {
   const bids = useBids()
-  const { data } = useSWR({ key: 'MyShortPuts', bids }, fetcher)
-  console.log('data', data)
-  return data ?? EMPTY
+  const { data, mutate } = useSWR({ key: 'MyShortPuts', bids }, fetcher)
+  return [data ?? EMPTY, mutate]
 }
