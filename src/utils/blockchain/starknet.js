@@ -44,21 +44,25 @@ export const sendTransaction = async (contract, method, args = {}) => {
   }
 };
 
-// not properly implemented yet
-export const sendTransactions = async (contract, method, args = {}) => {
+/*******HELPS WITH MULTICALL STATE CHANGING TRANSACTIONS */
+export const packTransaction = (contract, method, args = {}) => {
+  const calldata = stark.compileCalldata(args);
+  const transaction = {
+    contractAddress: contract.address,
+    entrypoint: method,
+    calldata
+  };
+  return transaction
+};
+
+export const sendTransactions = async (transactions) => {
   try {
-    const calldata = stark.compileCalldata(args);
-    const transaction = {
-      contractAddress: contract.address,
-      entrypoint: method,
-      calldata
-    };
-    return await getStarknet().account.execute(transaction);
+    return await getStarknet().account.execute(transactions);
   } catch (ex) {
     return Promise.reject(ex);
   }
 };
-
+/*******END OF - HELPS WITH MULTICALL STATE CHANGING TRANSACTIONS */
 
 export const waitForTransaction = async (transactionHash, requiredStatus, retryInterval = 5000) => {
   return new Promise((resolve, reject) => {
