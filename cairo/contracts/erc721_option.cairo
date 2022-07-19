@@ -8,7 +8,7 @@ from starkware.cairo.common.math import (
     unsigned_div_rem,
     assert_nn,
 )
-from starkware.cairo.common.math_cmp import is_le
+from starkware.cairo.common.math_cmp import is_le, is_not_zero
 from starkware.cairo.common.uint256 import (
     Uint256,
     uint256_add,
@@ -24,13 +24,18 @@ from openzeppelin.introspection.ERC165 import ERC165_supports_interface, ERC165_
 from starkware.cairo.common.bool import TRUE, FALSE
 from openzeppelin.token.ERC20.interfaces.IERC20 import IERC20
 from openzeppelin.token.erc721.interfaces.IERC721 import IERC721
+from starkware.cairo.lang.compiler.lib.registers import get_fp_and_pc
 
 from starkware.starknet.common.syscalls import (
+    call_contract,
     get_block_number,
     get_block_timestamp,
     get_contract_address,
     get_caller_address,
 )
+
+from starkware.cairo.common.alloc import alloc
+from starkware.cairo.common.memcpy import memcpy
 
 @view
 func onERC721Received(
@@ -58,21 +63,21 @@ namespace BidState:
 end
 
 struct ERC721PUT_PARAM:
-    member strike_price : Uint256
     member expiry_date : felt
     member erc721_address : felt
     member erc721_id : Uint256
     member premium : Uint256
+    member strike_price : Uint256
     # member buyer_address : felt
     # member seller_address : felt
 end
 
 struct ERC721PUT:
-    member params : ERC721PUT_PARAM
     member buyer_address : felt
     member seller_address : felt
     member status : felt
     member bid_id : felt
+    member params : ERC721PUT_PARAM
 end
 
 @storage_var
@@ -151,11 +156,11 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     )
 
     let bid_to_write : ERC721PUT = ERC721PUT(
-        params=bid,
         buyer_address=caller_address,
         seller_address=0,
         status=BidState.OPEN,
         bid_id=current_index,
+        params=bid,
     )
 
     # let bid_to_write : ERC721PUT = ERC721PUT(
@@ -190,11 +195,11 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
 
     if status == BidState.OPEN:
         let bid_to_write : ERC721PUT = ERC721PUT(
-            params=bid.params,
             buyer_address=bid.buyer_address,
             seller_address=caller_address,
             status=BidState.CANCELLED,
             bid_id=bid_id_,
+            params=bid.params,
         )
         bids.write(bid_id_, bid_to_write)
 
@@ -248,11 +253,11 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     )
 
     let bid_to_write : ERC721PUT = ERC721PUT(
-        params=bid.params,
         buyer_address=bid.buyer_address,
         seller_address=caller_address,
         status=BidState.ACTIVE,
         bid_id=bid_id_,
+        params=bid.params,
     )
 
     bids.write(bid_id_, bid_to_write)
@@ -290,14 +295,72 @@ func exercise_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_
     )
 
     let bid_to_write : ERC721PUT = ERC721PUT(
-        params=bid.params,
         buyer_address=bid.buyer_address,
         seller_address=bid.seller_address,
         status=BidState.CLOSED,
         bid_id=bid_id_,
+        params=bid.params,
     )
 
     bids.write(bid_id_, bid_to_write)
     # puts.write(bid_id, bid)
     return (success=TRUE)  # true or false
+end
+
+@view
+func view_bids_buyer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    user : felt
+) -> (bids_len : felt, bids : ERC721PUT*):
+    alloc_locals
+    let _bids_count : felt = bids_count.read()
+    let (result : ERC721PUT*) = alloc()
+
+    # return (bids_count=_bids_count)
+    let (result_len) = search_data(
+        bid_index=_bids_count, data=user, struct_index=ERC721PUT.buyer_address, result=result
+    )
+
+    return (result_len, result)
+end
+
+@view
+func view_bids_seller{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    user : felt
+) -> (bids_len : felt, bids : ERC721PUT*):
+    alloc_locals
+    let _bids_count : felt = bids_count.read()
+    let (result : ERC721PUT*) = alloc()
+
+    # return (bids_count=_bids_count)
+    let (result_len) = search_data(
+        bid_index=_bids_count, data=user, struct_index=ERC721PUT.seller_address, result=result
+    )
+
+    return (result_len, result)
+end
+
+func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    bid_index : felt, data : felt, struct_index : felt, result : ERC721PUT*
+) -> (result_len : felt):
+    alloc_locals
+    let (__fp__, _) = get_fp_and_pc()
+
+    let (local _bid : ERC721PUT) = bids.read(bid_index)
+    let (local _bid_felt : felt*) = bids.addr(bid_index)
+    local data_size : felt = 0
+
+    if [_bid_felt + struct_index] == data:
+        memcpy(result, _bid_felt, ERC721PUT.SIZE)
+        result = result + ERC721PUT.SIZE
+        data_size = ERC721PUT.SIZE
+    end
+
+    if bid_index == 0:
+        return (data_size)
+    end
+
+    let (len) = search_data(
+        bid_index=(bid_index - 1), data=data, struct_index=struct_index, result=result
+    )
+    return (len + data_size)
 end
