@@ -19,12 +19,15 @@ from starkware.cairo.common.uint256 import (
     uint256_eq,
 )
 
-from openzeppelin.token.erc721.library import ERC721_approve, ERC721_transferFrom
-from openzeppelin.introspection.ERC165 import ERC165_supports_interface, ERC165_register_interface
+from openzeppelin.token.erc721.library import ERC721
+from openzeppelin.introspection.IERC165 import IERC165
+from openzeppelin.introspection.ERC165 import ERC165
+
 from starkware.cairo.common.bool import TRUE, FALSE
 from openzeppelin.token.ERC20.interfaces.IERC20 import IERC20
 from openzeppelin.token.erc721.interfaces.IERC721 import IERC721
 from starkware.cairo.lang.compiler.lib.registers import get_fp_and_pc
+from openzeppelin.upgrades.library import Proxy
 
 from starkware.starknet.common.syscalls import (
     call_contract,
@@ -49,7 +52,7 @@ end
 func supportsInterface{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     interfaceId : felt
 ) -> (success : felt):
-    let (success) = ERC165_supports_interface(interfaceId)
+    let (success) = ERC165.supports_interface(interfaceId)
     return (success)
 end
 
@@ -315,7 +318,6 @@ func view_bids_buyer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_che
     let _bids_count : felt = bids_count.read()
     let (result : ERC721PUT*) = alloc()
 
-    # return (bids_count=_bids_count)
     let (result_len) = search_data(
         bid_index=_bids_count, data=user, struct_index=ERC721PUT.buyer_address, result=result
     )
@@ -345,7 +347,6 @@ func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
     alloc_locals
     let (__fp__, _) = get_fp_and_pc()
 
-    let (local _bid : ERC721PUT) = bids.read(bid_index)
     let (local _bid_felt : felt*) = bids.addr(bid_index)
     local data_size : felt = 0
 
@@ -363,4 +364,37 @@ func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
         bid_index=(bid_index - 1), data=data, struct_index=struct_index, result=result
     )
     return (len + data_size)
+end
+
+#
+# Initializer
+#
+
+@external
+func initializer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    proxy_admin : felt
+):
+    Proxy.initializer(proxy_admin)
+    return ()
+end
+
+#
+# Upgrades
+#
+
+@external
+func upgrade{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    new_implementation : felt
+):
+    # Proxy.assert_only_admin()
+    Proxy._set_implementation_hash(new_implementation)
+    return ()
+end
+
+@view
+func getImplementationHash{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    address : felt
+):
+    let (address) = Proxy.get_implementation_hash()
+    return (address)
 end
