@@ -124,7 +124,8 @@ def get_contract_def(path):
     path = contract_path(path)
     contract_def = compile_starknet_files(
         files=[path],
-        debug_info=True
+        debug_info=True,
+        disable_hint_validation=True
     )
     return contract_def
 

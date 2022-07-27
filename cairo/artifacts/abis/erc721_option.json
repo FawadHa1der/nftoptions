@@ -292,6 +292,22 @@
                 "type": "felt"
             }
         ],
+        "name": "settle_put_bid",
+        "outputs": [
+            {
+                "name": "success",
+                "type": "felt"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "bid_id_",
+                "type": "felt"
+            }
+        ],
         "name": "register_put_sell",
         "outputs": [
             {
