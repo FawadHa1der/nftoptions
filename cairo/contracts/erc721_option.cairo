@@ -315,8 +315,8 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     # %{ print(f'register_put_sell bid.buyer_address:{ids.bid.buyer_address} ') %}
     let (block_time_stamp : felt) = get_block_timestamp()
     let expiry_time : felt = bid.params.expiry_date
-    %{ print(f'register_put_sell bid.params.expiry_date:{ids.bid.params.expiry_date} ') %}
-    %{ print(f'register_put_sell block_time_stamp:{ids.block_time_stamp} ') %}
+    # %{ print(f'register_put_sell bid.params.expiry_date:{ids.bid.params.expiry_date} ') %}
+    # %{ print(f'register_put_sell block_time_stamp:{ids.block_time_stamp} ') %}
 
     with_attr error_message("current time is past the expiry date of the option"):
         assert_le(block_time_stamp, expiry_time)
