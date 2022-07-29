@@ -46,7 +46,25 @@ const ExerciseCard = withSuspense(
       createToast({ description: 'Your transaction successful', variant: 'success' })
     }
 
-    const isDisabled = put.status !== PutStatus.ACTIVE
+    const handleClickCancel = async () => {
+      setIsLoading(true)
+      try {
+        const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'cancel_put_bid', { bid_id: put.bid_id })
+        await waitForTransaction(tx.transaction_hash)
+        setIsLoading(false)
+        if (onTransact) {
+          onTransact()
+        }
+      } catch (e) {
+        console.error(e)
+        setIsLoading(false)
+        return
+      }
+      createToast({ description: 'Your transaction successful', variant: 'success' })
+    }
+
+
+    const isCancellable = put.status !== PutStatus.ACTIVE
     const { nftData, strike_price, expiry_date, premium } = put
 
     return (
@@ -98,12 +116,11 @@ const ExerciseCard = withSuspense(
           />
           <Button
             mt={8}
-            isDisabled={isDisabled}
             isLoading={isLoading}
-            label="Exercise Put"
+            label={isCancellable ? "Cancel my bid" : "Exercise Put"}
             variant="primary"
             size="large"
-            onClick={handleClickExercise}
+            onClick={isCancellable ? handleClickCancel : handleClickExercise}
           />
           <Link target="_blank" mx="auto" variant="secondary" mt={4} showRightIcon href={nftData.aspect_link}>
             View NFT on Aspect

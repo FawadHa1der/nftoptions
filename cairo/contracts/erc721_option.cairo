@@ -112,10 +112,8 @@ func premium_token_address() -> (address : felt):
 end
 
 @constructor
-func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-    _premium_token_address : felt
-):
-    premium_token_address.write(_premium_token_address)
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+    # DO NOT CALL USE CONSTRUCTOR, USE INITIALIZER
     return ()
 end
 
@@ -314,7 +312,15 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     let option_premium : Uint256 = bid.params.premium
     let strike_price : Uint256 = bid.params.strike_price
 
-    %{ print(f'register_put_sell bid.buyer_address:{ids.bid.buyer_address} ') %}
+    # %{ print(f'register_put_sell bid.buyer_address:{ids.bid.buyer_address} ') %}
+    let (block_time_stamp : felt) = get_block_timestamp()
+    let expiry_time : felt = bid.params.expiry_date
+    %{ print(f'register_put_sell bid.params.expiry_date:{ids.bid.params.expiry_date} ') %}
+    %{ print(f'register_put_sell block_time_stamp:{ids.block_time_stamp} ') %}
+
+    with_attr error_message("current time is past the expiry date of the option"):
+        assert_le(block_time_stamp, expiry_time)
+    end
 
     with_attr error_message("Buyer and seller cannot be the same"):
         assert_not_equal(bid.buyer_address, caller_address)

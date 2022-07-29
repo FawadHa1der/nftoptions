@@ -8,6 +8,7 @@ import time
 
 from starkware.starknet.testing.starknet import Starknet
 from signers import MockSigner
+from starkware.starknet.business_logic.state.state import BlockInfo
 
 from starkware.starknet.testing.starknet import Starknet
 from starkware.starknet.compiler.compile import compile_starknet_files
@@ -34,6 +35,13 @@ RECIPIENT = 555
 DATA = [0x42, 0x89, 0x55]
 # selector id
 ENUMERABLE_INTERFACE_ID = 0x780e9d63
+EXPIRY_DATE = epoch_time + (3*86400) # 3 days from now
+BID = uint(10000)
+PREMIUM = uint(5000)
+NULL_BUYERS_ADDRESS = 734597439539
+NULL_SELLERS_ADDRESS = 4758947594379
+DEFAULT_TIMESTAMP = 1640991600
+ONE_DAY = 86400
 
 
 def get_oz_lib_def(path):
@@ -77,6 +85,9 @@ async def erc721_init(contract_defs):
 
     starknet = await Starknet.empty()
     # await starknet.deploy(contract_def=account_def, constructor_calldata=[signer.public_key])
+    update_starknet_block(
+    starknet, block_timestamp=DEFAULT_TIMESTAMP)
+
     account1 = await starknet.deploy(contract_class=account_def, constructor_calldata=[signer.public_key])
     account2 = await starknet.deploy(
         contract_class=account_def,
@@ -109,11 +120,12 @@ async def erc721_init(contract_defs):
     erc721Option = await starknet.deploy(
         contract_class=erc721Option_def,
         constructor_calldata=[
-            erc20.contract_address           # owner
+                       # owner
         ]
     )
 
     return (
+        starknet,
         starknet.state,
         account1,
         account2,
@@ -126,20 +138,21 @@ async def erc721_init(contract_defs):
 @pytest.fixture(scope='module')
 async def erc721_factory(contract_defs, erc721_init):
     account_def, erc20_def, erc721_def, erc721Option_def = contract_defs
-    state, account1, account2, erc721, erc20, erc721Option = await erc721_init
+    starknet, state, account1, account2, erc721, erc20, erc721Option = await erc721_init
     _state = state.copy()
+    starknet.state = _state
     account1 = cached_contract(_state, account_def, account1)
     account2 = cached_contract(_state, account_def, account2)
     erc721 = cached_contract(_state, erc721_def, erc721)
     erc20 = cached_contract(_state, erc20_def, erc20)
     erc721Option = cached_contract(_state, erc721Option_def, erc721Option)
 
-    return account1, account2, erc721, erc20, erc721Option
+    return starknet, account1, account2, erc721, erc20, erc721Option
 
 
 @pytest.fixture(scope='module')
 async def erc721_minted(erc721_factory):
-    account1, account2, erc721, erc20, erc721Option = await erc721_factory
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
     # mint tokens to account
     for token in TOKENS:
         await signer.send_transaction(
@@ -170,23 +183,21 @@ async def erc721_minted(erc721_factory):
             account2.contract_address,
             *to_uint(400000)
         ])
-    return account1, account2, erc721, erc20, erc721Option
+    await signer.send_transaction(
+    account1, erc721Option.contract_address, 'initializer', [
+        account1.contract_address, erc20.contract_address]
+    )
 
-# struct ERC721PUT:
-#     member strike_price : Uint256
-#     member expiry_date : felt
-#     member erc721_address : felt
-#     member erc721_id : Uint256
-#     member premium : Uint256
-#     member buyer_address : felt
-#     member seller_address : felt
-# end
+    return starknet, account1, account2, erc721, erc20, erc721Option
 
-EXPIRY_DATE = epoch_time + (3*86400) # 3 days from now
-BID = uint(10000)
-PREMIUM = uint(5000)
-NULL_BUYERS_ADDRESS = 734597439539
-NULL_SELLERS_ADDRESS = 4758947594379
+
+
+def update_starknet_block(starknet, block_number=1, block_timestamp= ONE_DAY):
+    starknet.state.state.block_info = BlockInfo(
+        block_number=block_number, block_timestamp=block_timestamp, 
+        gas_price=starknet.state.state.block_info.gas_price,
+        sequencer_address=starknet.state.state.block_info.sequencer_address, 
+        starknet_version=starknet.state.state.block_info.starknet_version )
 
 
 @pytest.fixture(scope="module")
@@ -198,7 +209,7 @@ def event_loop():
 
 @pytest.mark.asyncio
 async def test_open_bid(erc721_minted):
-    account1, account2, erc721, erc20, erc721Option = await erc721_minted
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
     
     execution_info = await erc20.balanceOf(account1.contract_address).call()
     initialAccount1Balance = execution_info.result.balance[0]
@@ -208,33 +219,14 @@ async def test_open_bid(erc721_minted):
 
     tx_exec_info = await signer.send_transaction(
         account1, erc721Option.contract_address, 'register_put_bid', [
-            EXPIRY_DATE,
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
             erc721.contract_address,
             *(TOKENS[0]),
             *PREMIUM,
             *BID,
-            # NULL_BUYERS_ADDRESS,
-            # NULL_SELLERS_ADDRESS
         ])
     assert tx_exec_info.result.response == [0]
     BID_ID = tx_exec_info.result.response[0]
-
-    # tx_exec_info = await signer.send_transaction(
-    # account1, erc721Option.contract_address, 'register_put_bid', [
-    #     EXPIRY_DATE,
-    #     erc721.contract_address,
-    #     *(TOKENS[1]),
-    #     *PREMIUM,
-    #     *BID,
-    #     # NULL_BUYERS_ADDRESS,
-    #     # NULL_SELLERS_ADDRESS
-    # ])
-
-    # assert tx_exec_info.result.response == [1]
-    # BID_ID = tx_exec_info.result.response[0]
-
-    # execution_info1 = await erc721Option.view_bids_count().call()
-    # assert execution_info1.result.bids_count == 2
 
     execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
     print(f"results to {execution_info1.result}")
@@ -284,4 +276,48 @@ async def test_open_bid(erc721_minted):
 
     assert account2.contract_address == execution_info.result.owner
 
+@pytest.mark.asyncio
+async def test_expiry_time(erc721_minted):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+    
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
+
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
+
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[0]),
+            *PREMIUM,
+            *BID,
+            # NULL_BUYERS_ADDRESS,
+            # NULL_SELLERS_ADDRESS
+        ])
+    assert tx_exec_info.result.response == [0]
+    BID_ID = tx_exec_info.result.response[0]
+
+    update_starknet_block(starknet, block_timestamp=DEFAULT_TIMESTAMP +(ONE_DAY * 4))
+    
  
+    await assert_revert(signer.send_transaction(
+        account2, erc721Option.contract_address, 'register_put_sell', [
+        tx_exec_info.result.response[0]])
+    , reverted_with="current time is past the expiry date of the option")
+
+    # tx_exec_info = await signer.send_transaction(
+    # account1, erc721Option.contract_address, 'register_put_bid', [
+    #     EXPIRY_DATE,
+    #     erc721.contract_address,
+    #     *(TOKENS[1]),
+    #     *PREMIUM,
+    #     *BID,
+    #     # NULL_BUYERS_ADDRESS,
+    #     # NULL_SELLERS_ADDRESS
+    # ])
+
+    # assert tx_exec_info.result.response == [1]
+    # BID_ID = tx_exec_info.result.response[0]
+
