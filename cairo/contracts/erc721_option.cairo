@@ -112,8 +112,10 @@ func premium_token_address() -> (address : felt):
 end
 
 @constructor
-func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}( _premium_token_address : felt):
     # DO NOT CALL USE CONSTRUCTOR, USE INITIALIZER
+    # temp use until we know we can use view methods without using invok/transaction
+    premium_token_address.write(_premium_token_address)
     return ()
 end
 
