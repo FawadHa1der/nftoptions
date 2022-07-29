@@ -7,7 +7,7 @@ import optionsCompiledContract from '../compiledcairo/erc721_option.json'
 import { PutData, PutStatus } from './useBids'
 import { fetcher, NFTData } from './useMyNFTs'
 
-const optionsContractAddress = '0x02e6a26d2fcb7256934c822ad8a81ee40aed922b271495d8eb1e05d031192f52'
+const optionsContractAddress = '0x0275f6440ef35674ee444879de9428c389cd32874a40d8b4d0030d00b7261a88'
 
 const bidsCache: PutData[] = []
 

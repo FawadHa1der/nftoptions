@@ -19,29 +19,29 @@
     {
         "members": [
             {
-                "name": "params",
-                "offset": 0,
-                "type": "ERC721PUT_PARAM"
-            },
-            {
                 "name": "buyer_address",
-                "offset": 8,
+                "offset": 0,
                 "type": "felt"
             },
             {
                 "name": "seller_address",
-                "offset": 9,
+                "offset": 1,
                 "type": "felt"
             },
             {
                 "name": "status",
-                "offset": 10,
+                "offset": 2,
                 "type": "felt"
             },
             {
                 "name": "bid_id",
-                "offset": 11,
+                "offset": 3,
                 "type": "felt"
+            },
+            {
+                "name": "params",
+                "offset": 4,
+                "type": "ERC721PUT_PARAM"
             }
         ],
         "name": "ERC721PUT",
@@ -51,27 +51,27 @@
     {
         "members": [
             {
-                "name": "strike_price",
-                "offset": 0,
-                "type": "Uint256"
-            },
-            {
                 "name": "expiry_date",
-                "offset": 2,
+                "offset": 0,
                 "type": "felt"
             },
             {
                 "name": "erc721_address",
-                "offset": 3,
+                "offset": 1,
                 "type": "felt"
             },
             {
                 "name": "erc721_id",
-                "offset": 4,
+                "offset": 2,
                 "type": "Uint256"
             },
             {
                 "name": "premium",
+                "offset": 4,
+                "type": "Uint256"
+            },
+            {
+                "name": "strike_price",
                 "offset": 6,
                 "type": "Uint256"
             }
@@ -135,6 +135,32 @@
         ],
         "keys": [],
         "name": "ApprovalForAll",
+        "type": "event"
+    },
+    {
+        "data": [
+            {
+                "name": "implementation",
+                "type": "felt"
+            }
+        ],
+        "keys": [],
+        "name": "Upgraded",
+        "type": "event"
+    },
+    {
+        "data": [
+            {
+                "name": "previousAdmin",
+                "type": "felt"
+            },
+            {
+                "name": "newAdmin",
+                "type": "felt"
+            }
+        ],
+        "keys": [],
+        "name": "AdminChanged",
         "type": "event"
     },
     {
@@ -266,6 +292,22 @@
                 "type": "felt"
             }
         ],
+        "name": "settle_put_bid",
+        "outputs": [
+            {
+                "name": "success",
+                "type": "felt"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "bid_id_",
+                "type": "felt"
+            }
+        ],
         "name": "register_put_sell",
         "outputs": [
             {
@@ -289,6 +331,86 @@
                 "type": "felt"
             }
         ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "user",
+                "type": "felt"
+            }
+        ],
+        "name": "view_bids_buyer",
+        "outputs": [
+            {
+                "name": "bids_len",
+                "type": "felt"
+            },
+            {
+                "name": "bids",
+                "type": "ERC721PUT*"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "user",
+                "type": "felt"
+            }
+        ],
+        "name": "view_bids_seller",
+        "outputs": [
+            {
+                "name": "bids_len",
+                "type": "felt"
+            },
+            {
+                "name": "bids",
+                "type": "ERC721PUT*"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "proxy_admin",
+                "type": "felt"
+            },
+            {
+                "name": "_premium_token_address",
+                "type": "felt"
+            }
+        ],
+        "name": "initializer",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "new_implementation",
+                "type": "felt"
+            }
+        ],
+        "name": "upgrade",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getImplementationHash",
+        "outputs": [
+            {
+                "name": "address",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     }
 ]
