@@ -11,7 +11,7 @@ import withSuspense from 'hooks/withSuspense'
 import React, { useState } from 'react'
 import { Contract, uint256 } from 'starknet'
 import { MarginProps } from 'styled-system'
-import { callContract, sendTransaction } from 'utils/blockchain/starknet'
+import { callContract, constructTransaction, sendTransaction, sendTransactions } from 'utils/blockchain/starknet'
 import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
 
 type Props = {
@@ -53,13 +53,6 @@ const BuyButton = withSuspense(
         end
         8 fields in the transaction
          */
-      const paramStruct = {
-        a: strikePriceUint256,
-        b: expiryTimestamp,
-        c: nftData.contract_address,
-        d: erc721_id,
-        e: premiumUint256,
-      }
       const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
       const existingBalance = uint256.uint256ToBN(balanceResult[0])
@@ -69,6 +62,28 @@ const BuyButton = withSuspense(
           description: 'Not enough balance/TEST tokens in your wallet.',
           variant: 'error',
         })
+        return
+      }
+
+      let transactions: any = []
+      if (isERC721Approved === false) {
+        const erc721ContractInstance = new Contract((erc721compiledcontract as any).abi, contract_address)
+        transactions.push(constructTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id }))
+      }
+
+      //     struct ERC721PUT_PARAM:
+      //     member expiry_date : felt
+      //     member erc721_address : felt
+      //     member erc721_id : Uint256
+      //     member premium : Uint256
+      //     member strike_price : Uint256
+      // end
+      const paramStruct = {
+        b: expiryTimestamp,
+        c: nftData.contract_address,
+        d: erc721_id,
+        e: premiumUint256,
+        a: strikePriceUint256,
       }
 
       const allowanceResult = await callContract(
@@ -80,24 +95,16 @@ const BuyButton = withSuspense(
 
       const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0])
       if (existingMoneyAllowance.ltn(parseInt(premium))) {
-        try {
-          await sendTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
-            spender: OPTIONS_CONTRACT_ADDRESS,
-            amount: getUint256CalldataFromBN(100000000),
-          })
-        } catch (e) {
-          setIsLoading(false)
-          createToast({
-            description: 'Cancelled approval in wallet',
-            variant: 'error',
-          })
-          return
-        }
+        transactions.push(constructTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
+          spender: OPTIONS_CONTRACT_ADDRESS,
+          amount: getUint256CalldataFromBN(100000000),
+        }))
       }
 
       createToast({ description: 'Registering your bid now', autoClose: 5000 })
       try {
-        const transaction_response = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'register_put_bid', paramStruct)
+        transactions.push(constructTransaction(OPTIONS_CONTRACT_INSTANCE, 'register_put_bid', paramStruct))
+        const transaction_response = await sendTransactions(transactions)
         console.log(`Waiting for register_put_bid Tx ${transaction_response.transaction_hash} to be Accepted `)
         await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash)
         if (onTransact) {
@@ -126,10 +133,10 @@ const BuyButton = withSuspense(
         {...styleProps}
         isLoading={isLoading}
         isDisabled={isERC721Approved && isDisabled}
-        label={isERC721Approved ? 'Buy PUT' : 'Approve'}
+        label={'Buy PUT'}
         variant="primary"
         size="lg"
-        onClick={isERC721Approved ? handleClickBuy : handleClickApprove}
+        onClick={handleClickBuy}
       />
     )
   },

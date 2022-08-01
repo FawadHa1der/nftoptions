@@ -45,7 +45,7 @@ export const sendTransaction = async (contract, method, args = {}) => {
 };
 
 /*******HELPS WITH MULTICALL STATE CHANGING TRANSACTIONS */
-export const packTransaction = (contract, method, args = {}) => {
+export const constructTransaction = (contract, method, args = {}) => {
   const calldata = stark.compileCalldata(args);
   const transaction = {
     contractAddress: contract.address,
