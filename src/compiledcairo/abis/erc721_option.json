@@ -243,12 +243,7 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "name": "_premium_token_address",
-                "type": "felt"
-            }
-        ],
+        "inputs": [],
         "name": "constructor",
         "outputs": [],
         "type": "constructor"

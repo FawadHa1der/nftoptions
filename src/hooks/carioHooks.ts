@@ -7,7 +7,7 @@ import optionsCompiledContract from '../compiledcairo/erc721_option.json'
 import { PutData, PutStatus } from './useBids'
 import { fetcher, NFTData } from './useMyNFTs'
 
-const optionsContractAddress = '0x0275f6440ef35674ee444879de9428c389cd32874a40d8b4d0030d00b7261a88'
+const optionsContractAddress = '0x048a64f708011fb5089778204f37d6111bd9bbac0fe4b6e7851292b8cbeeb6ef'
 
 const bidsCache: PutData[] = []
 
@@ -33,6 +33,7 @@ export async function getAllBidsTest(): Promise<PutData[]> {
         status: option.status.toNumber(),
         bid_id: option.bid_id.toString(10),
       }
+      console.log(data)
       return data
     })
     all_bids.push(...mapped_data)

@@ -1,65 +1,56 @@
-from nile.core.account import Account
 import os
+from dotenv import load_dotenv
+from nile.nre import NileRuntimeEnvironment
 
+# Dummy values, should be replaced by env variables
 os.environ["SIGNER"] = "123456"
-#os.environ["SIGNER"] = "123456"
-RECV_ACCOUNTS = []
+os.environ["USER_1"] = "12345654321"
+from nile.signer import Signer
 
-TEST_721_TOKEN_ADDRESS = 0x03a0dbc41c598ca8a59e16c2c2aa3b6f4c82ab62331d91a5df4af3eb18156122
+
+from nile.nre import NileRuntimeEnvironment
+
+# Dummy values, should be replaced by env variables
+os.environ["SIGNER"] = "123456"
+os.environ["USER_1"] = "12345654321"
+
+CLASS_HASH_ERC721_OPTION = 0x65cb389d07985f12ca9bb2210204f4a15825270e5ffaf9f3923d133225c7535
+ERC20PAYMENT_TEST_TOKEN = 0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10
+
+def to_uint(a):
+    """Takes in value, returns uint256-ish tuple."""
+    return (a & ((1 << 128) - 1), a >> 128)
+
 
 def str_to_felt(text):
     b_text = bytes(text, "ascii")
     return int.from_bytes(b_text, "big")
 
 
-def felt_to_str(felt):
-    b_felt = felt.to_bytes(31, "big")
-    return b_felt.decode()
+def run(nre: NileRuntimeEnvironment):
+    load_dotenv()
+    # predeclared_class = nre.get_declaration("erc721_option")
+    
+    # signer,_ = nre.get_deployment("account-0")
+    user_1 = nre.get_or_deploy_account("PRIVATE_KEY1")
+    print(f"Signer account: {user_1.address}")
+    # print(f"User1 account: {user_1.address}")
 
+    # proxy_impl, proxy_abi = nre.deploy("Proxy", arguments=[f'{CLASS_HASH_ERC721_OPTION}'])
+    # print(f"Deployed proxy_impl to {proxy_impl}")
 
-def run(nre):
-    felt721 = str_to_felt("Test721")
-    ricks = str_to_felt("ricks")
-    signer = Account("SIGNER", nre.network)
+    # xzkp_token_implementation = None
+    # try:
+    #     xzkp_token_implementation, abi = nre.deploy(
+    #         "ZkPadStaking", alias="xzkp_token_implementation")
+    # except Exception as error:
+    #     if "already exists" in str(error):
+    #         xzkp_token_implementation, _ = nre.get_deployment(
+    #             "xzkp_token_implementation")
+    #     else:
+    #         print(f"DEPLOYMENT ERROR: {error}")
+    # finally:
+    #     print(
+    #         f"xZKP token implementation deployed to {xzkp_token_implementation}")
 
-    print(f"Signer account: {signer}")
-    print(f"Network: {nre.network}")
-    # print(f"OSEnviron: {os.environ}")
-    # print(f" felt721 is  {felt721} and signer address is {signer.address}")
-
-    test721Impl, test721abi = nre.deploy(
-        "Test721", arguments=[f'{felt721}', f'{felt721}', f'{signer.address}'], alias="Test721")
-    print(f"Deployed test 721 to {test721Impl}")
-
-    stakingpool_impl, abi = nre.deploy(
-        "stakingpool", arguments=[], alias="stakingpool")
-    print(f"Deployed stakingpool_impl to {stakingpool_impl}")
-
-    # ricks = await starknet.deploy(
-    #     contract_def=ricks_def,
-    #     constructor_calldata=[
-    #         str_to_felt("RICKS"),      # name
-    #         str_to_felt("RCK"),        # symbol
-    #         18,                        # decimals
-    #         INITIAL_RICKS_SUPPLY,               # initial_supply
-    #         erc721.contract_address,
-    #         TOKEN,
-    #         DAILY_INFLATION_RATE,
-    #         stakingPool.contract_address,
-    #         erc20Weth.contract_address
-    #     ]
-    # )
-
-    # ricks_impl, abi = nre.deploy(
-    #     "ricks", arguments=[f'{ricks}', f'{ricks}', f'{18}', f'{INITIAL_RICKS_SUPPLY}', f'{DAILY_INFLATION_RATE}', f'{AUCTION_LENGTH}', f'{AUCTION_INTERVAL}', f'{MIN_BID_INCREASE}', f'{stakingpool_impl}', f'{TEST_REWARD_TOKEN_ADDRESS}'], alias="ricks")
-    # print(f"Deployed ricks_impl to {ricks_impl}")
-
-    # erc721_impl, abi = nre.deploy(
-    #     "weth", arguments=[], alias="mytoken")
-    # print(f"Deployed stakingpool_impl to {stakingpool_impl}")
-
-    # stakingpool_impl, abi = nre.deploy(
-    #     "stakingpool", arguments=[], alias="stakingpool")
-    # print(f"Deployed stakingpool_impl to {stakingpool_impl}")
-
-    # nre.invoke
+    user_1.send(0x048a64f708011fb5089778204f37d6111bd9bbac0fe4b6e7851292b8cbeeb6ef, 'initializer', [int(user_1.address, 16), ERC20PAYMENT_TEST_TOKEN])
