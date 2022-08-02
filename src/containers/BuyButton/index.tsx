@@ -33,26 +33,9 @@ const BuyButton = withSuspense(
     const isERC721Approved = useIsERC721Approved(contract_address, token_id)
 
     const [isLoading, setIsLoading] = useState(false)
-    async function handleClickApprove() {
-      const erc721ContractInstance = new Contract((erc721compiledcontract as any).abi, contract_address)
-      try {
-        await sendTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id })
-      } catch {
-        return
-      }
-    }
 
     async function handleClickBuy() {
       setIsLoading(true)
-      /*struct ERC721PUT:
-            member strike_price : Uint256
-            member expiry_date : felt
-            member erc721_address : felt
-            member erc721_id : Uint256
-            member premium : Uint256
-        end
-        8 fields in the transaction
-         */
       const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
       const existingBalance = uint256.uint256ToBN(balanceResult[0])
@@ -71,13 +54,6 @@ const BuyButton = withSuspense(
         transactions.push(constructTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id }))
       }
 
-      //     struct ERC721PUT_PARAM:
-      //     member expiry_date : felt
-      //     member erc721_address : felt
-      //     member erc721_id : Uint256
-      //     member premium : Uint256
-      //     member strike_price : Uint256
-      // end
       const paramStruct = {
         b: expiryTimestamp,
         c: nftData.contract_address,
