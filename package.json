@@ -1,10 +1,10 @@
 {
-  "name": "cairopal",
+  "name": "NFT-PUT",
   "version": "0.3.0",
-  "description": "Flexible Starknet Dapp Template",
+  "description": "Buy a PUT on your expensive NFT",
   "main": "index.js",
-  "repository": "https://github.com/fawadha1der/cairopal.git",
-  "author": "Alucard <https://github.com/fawadha1der>",
+  "repository": "https://github.com/FawadHa1der/nftoptions.git",
+  "author": "Fawad Haider <https://github.com/fawadha1der>",
   "license": "AGPL-3.0-only",
   "private": false,
   "scripts": {
