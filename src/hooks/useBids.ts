@@ -32,7 +32,7 @@ export async function fetcher(): Promise<PutData[]> {
   // would be good to generalise these to a deployement file
   const optioncontract = createContract(OPTIONS_CONTRACT_ADDRESS, optionsCompiledContract.abi)
   const all_bids = await callContract(optioncontract, 'view_all_bids')
-  console.log('UN MAPPED all data  ---> ' + JSON.stringify(all_bids))
+  // console.log('UN MAPPED all data  ---> ' + JSON.stringify(all_bids))
   const mapped_all_bids: PutData[] = []
   if (all_bids.length > 0) {
     mapped_all_bids.push(...all_bids[0].map((option: any) => {
@@ -47,17 +47,17 @@ export async function fetcher(): Promise<PutData[]> {
         status: option.status.toNumber(),
         bid_id: option.bid_id.toString(10),
         isExpiredButNotSettled() {
-          return (this.status == PutStatus.ACTIVE && parseInt(this.expiry_date) < ((new Date()).getUTCSeconds() + 86400))
+          return (this.status == PutStatus.ACTIVE && parseInt(this.expiry_date) < ((Math.floor(Date.now() / 1000) + 86400)))
         },
         isExpiredButOpen() {
-          return (this.status == PutStatus.OPEN && parseInt(this.expiry_date) < ((new Date()).getUTCSeconds() + 86400))
+          return (this.status == PutStatus.OPEN && parseInt(this.expiry_date) < ((Math.floor(Date.now() / 1000) + 86400)))
         }
       }
       console.log(data)
       return data
     }))
 
-    console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
+    //    console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
   }
   return mapped_all_bids
 }
