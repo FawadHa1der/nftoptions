@@ -192,17 +192,6 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
         assert bid.buyer_address = caller_address
     end
 
-    # let (local is_not_requested_by_buyer : felt) = is_not_zero(bid.buyer_address - caller_address)
-    let (block_time_stamp : felt) = get_block_timestamp()
-    let final_expiry_time : felt = bid.params.expiry_date + 86400  # add one day to expiry date
-    let (local is_past_expiry : felt) = is_le(final_expiry_time, block_time_stamp)
-
-    if is_past_expiry == 1:
-        with_attr error_message("cant cancel past the expiry date"):
-            assert 1 = 0
-        end
-    end
-
     if status == BidState.OPEN:
         let bid_to_write : ERC721PUT = ERC721PUT(
             buyer_address=bid.buyer_address,
@@ -212,12 +201,6 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
             params=bid.params,
         )
         bids.write(bid_id_, bid_to_write)
-        # let balance : Uint256 = IERC20.balanceOf(
-        #     contract_address=_premium_token_address, account=option_contract_address
-        # )
-
-        # %{ print(f'IERC20.balanceOf :{ids.option_contract_address}    {ids.balance.low} ') %}
-        # %{ print(f'OptionPremium :{ids.option_contract_address}    {ids.option_premium.low} ') %}
 
         IERC20.transfer(
             contract_address=_premium_token_address, recipient=caller_address, amount=option_premium

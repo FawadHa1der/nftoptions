@@ -63,7 +63,7 @@ const SellButton = withSuspense(
         try {
           transactions.push(constructTransaction(OPTIONS_CONTRACT_INSTANCE, 'register_put_sell', { bid_id_: put.bid_id }))
           const transaction_response = await sendTransactions(transactions)
-          console.log(`Waiting for register_put_bid Tx ${transaction_response.transaction_hash} to be Accepted `)
+          console.log(`Waiting for register_put_sell Tx ${transaction_response.transaction_hash} to be Accepted `)
           await getStarknet().provider.waitForTransaction(transaction_response.transaction_hash)
           if (onTransact) {
             console.log('onTransact')

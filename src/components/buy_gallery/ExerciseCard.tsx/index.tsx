@@ -16,8 +16,7 @@ import withSuspense from 'hooks/withSuspense'
 import { ACTION_CARD_WIDTH } from 'pages'
 import React, { useState } from 'react'
 import { MarginProps } from 'styled-system'
-import { starknet } from 'utils/blockchain'
-import { sendTransaction, waitForTransaction } from 'utils/blockchain/starknet'
+import { sendTransaction } from 'utils/blockchain/starknet'
 import formatDate from 'utils/formatDate'
 import formatUSD from 'utils/formatUSD'
 import { getStarknet } from 'get-starknet'
@@ -34,6 +33,23 @@ const ExerciseCard = withSuspense(
       setIsLoading(true)
       try {
         const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'exercise_put', { bid_id: put.bid_id })
+        await getStarknet().provider.waitForTransaction(tx.transaction_hash)
+        setIsLoading(false)
+        if (onTransact) {
+          onTransact()
+        }
+      } catch (e) {
+        console.error(e)
+        setIsLoading(false)
+        return
+      }
+      createToast({ description: 'Your transaction successful', variant: 'success' })
+    }
+
+    const handleClickSettle = async () => {
+      setIsLoading(true)
+      try {
+        const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'settle_put_bid', { bid_id: put.bid_id })
         await getStarknet().provider.waitForTransaction(tx.transaction_hash)
         setIsLoading(false)
         if (onTransact) {
@@ -118,10 +134,10 @@ const ExerciseCard = withSuspense(
           <Button
             mt={8}
             isLoading={isLoading}
-            label={isCancellable ? "Cancel my bid" : "Exercise Put"}
+            label={isCancellable ? "Cancel my bid" : (put.isExpiredButNotSettled() ? "Settle Put" : "Exercise Put")}
             variant="primary"
             size="large"
-            onClick={isCancellable ? handleClickCancel : handleClickExercise}
+            onClick={isCancellable ? handleClickCancel : (put.isExpiredButNotSettled() ? handleClickSettle : handleClickExercise)}
           />
           <Link target="_blank" mx="auto" variant="secondary" mt={4} showRightIcon href={nftData.aspect_link}>
             View NFT on Aspect
