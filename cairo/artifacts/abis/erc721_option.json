@@ -350,6 +350,22 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "view_all_bids",
+        "outputs": [
+            {
+                "name": "bids_len",
+                "type": "felt"
+            },
+            {
+                "name": "bids",
+                "type": "ERC721PUT*"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "name": "user",

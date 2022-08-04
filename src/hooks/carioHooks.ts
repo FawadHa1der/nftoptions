@@ -15,13 +15,12 @@ export async function getAllBidsTest(): Promise<PutData[]> {
   // would be good to generalise these to a deployement file
   console.log('!'.repeat(100))
   const optioncontract = createContract(optionsContractAddress, optionsCompiledContract.abi)
-  const view_bids_count = await callContract(optioncontract, 'view_bids_count')
+  const all_bids = await callContract(optioncontract, 'view_all_bids')
+  console.log('UN MAPPED all data  ---> ' + JSON.stringify(all_bids))
+  const mapped_all_bids: PutData[] = []
+  if (all_bids.length > 0) {
 
-  const all_bids: PutData[] = []
-
-  for (let i = 0; i < view_bids_count[0]; i++) {
-    const bid_result = await callContract(optioncontract, 'view_bid', i.toString())
-    const mapped_data = bid_result.map((option: any) => {
+    mapped_all_bids.push(...all_bids[0].map((option: any) => {
       const data: PutData = {
         strike_price: uint256.uint256ToBN(option.params.strike_price).toString(10),
         expiry_date: option.params.expiry_date.toString(10),
@@ -35,13 +34,34 @@ export async function getAllBidsTest(): Promise<PutData[]> {
       }
       console.log(data)
       return data
-    })
-    all_bids.push(...mapped_data)
+    }))
   }
 
-  bidsCache.push(...all_bids)
-  console.log('all data  ---> ' + JSON.stringify(all_bids))
-  return all_bids
+
+  bidsCache.push(...mapped_all_bids)
+  console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
+  return mapped_all_bids
+
+  // for (let i = 0; i < view_bids_count[0]; i++) {
+  //   const bid_result = await callContract(optioncontract, 'view_bid', i.toString())
+  //   const mapped_data = bid_result.map((option: any) => {
+  //     const data: PutData = {
+  //       strike_price: uint256.uint256ToBN(option.params.strike_price).toString(10),
+  //       expiry_date: option.params.expiry_date.toString(10),
+  //       erc721_address: option.params.erc721_address.toString(16),
+  //       erc721_id: uint256.uint256ToBN(option.params.erc721_id).toString(10),
+  //       premium: uint256.uint256ToBN(option.params.premium).toString(10),
+  //       buyer_address: option.buyer_address.toString(16),
+  //       seller_address: option.seller_address.toString(16),
+  //       status: option.status.toNumber(),
+  //       bid_id: option.bid_id.toString(10),
+  //     }
+  //     console.log(data)
+  //     return data
+  //   })
+  //   all_bids.push(...mapped_data)
+  // }
+
 }
 
 export async function useMyNFTSTest(user: string): Promise<NFTData[]> {

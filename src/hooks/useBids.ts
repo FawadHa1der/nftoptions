@@ -21,19 +21,18 @@ export enum PutStatus {
   OPEN = 1,
   CANCELLED = 2,
   ACTIVE = 3,
-  CLOSED = 4,
+  SETTLED = 4,
+  EXERCISED = 5,
 }
 
 export async function fetcher(): Promise<PutData[]> {
   // would be good to generalise these to a deployement file
   const optioncontract = createContract(OPTIONS_CONTRACT_ADDRESS, optionsCompiledContract.abi)
-  const view_bids_count = await callContract(optioncontract, 'view_bids_count')
-
-  const all_bids: PutData[] = []
-
-  for (let i = 0; i < view_bids_count[0]; i++) {
-    const bid_result = await callContract(optioncontract, 'view_bid', i.toString())
-    const mapped_data = bid_result.map((option: any) => {
+  const all_bids = await callContract(optioncontract, 'view_all_bids')
+  console.log('UN MAPPED all data  ---> ' + JSON.stringify(all_bids))
+  const mapped_all_bids: PutData[] = []
+  if (all_bids.length > 0) {
+    mapped_all_bids.push(...all_bids[0].map((option: any) => {
       const data: PutData = {
         strike_price: uint256.uint256ToBN(option.params.strike_price).toString(10),
         expiry_date: option.params.expiry_date.toString(10),
@@ -45,11 +44,13 @@ export async function fetcher(): Promise<PutData[]> {
         status: option.status.toNumber(),
         bid_id: option.bid_id.toString(10),
       }
+      console.log(data)
       return data
-    })
-    all_bids.push(...mapped_data)
+    }))
+
+    console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
   }
-  return all_bids
+  return mapped_all_bids
 }
 
 const EMPTY: PutData[] = []

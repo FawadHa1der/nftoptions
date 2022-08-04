@@ -112,7 +112,7 @@ func premium_token_address() -> (address : felt):
 end
 
 @constructor
-func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}( ):
+func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
     # DO NOT CALL USE CONSTRUCTOR, USE INITIALIZER
     # temp use until we know we can use view methods without using invok/transaction
     # premium_token_address.write(_premium_token_address)
@@ -431,6 +431,44 @@ func view_bids_buyer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_che
         bid_index=_bids_count - 1, data=user, struct_index=ERC721PUT.buyer_address, result=result
     )
     return (result_len, result)
+end
+
+@view
+func view_all_bids{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+    bids_len : felt, bids : ERC721PUT*
+):
+    alloc_locals
+    let (__fp__, _) = get_fp_and_pc()
+
+    let _bids_count : felt = bids_count.read()
+    let (result : ERC721PUT*) = alloc()
+
+    # %{ print(f'ERC721PUT.SIZE:{ids.ERC721PUT.SIZE} ') %}
+    # %{ print(f'ERC721PUT.RESULT:{ids.result} ') %}
+    # %{ print(f'_bids_count:{ids._bids_count} ') %}
+
+    let (result_len) = view_bid_recursive(bid_index=_bids_count - 1, result=result)
+    return (result_len, result)
+end
+
+func view_bid_recursive{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    bid_index : felt, result : ERC721PUT*
+) -> (result_len : felt):
+    alloc_locals
+    let (__fp__, _) = get_fp_and_pc()
+
+    let (local _bid : ERC721PUT) = bids.read(bid_index)
+    local data_size
+
+    memcpy(result, &_bid, ERC721PUT.SIZE)
+    data_size = ERC721PUT.SIZE
+
+    if bid_index == 0:
+        return (1)
+    end
+
+    let (len) = view_bid_recursive(bid_index=(bid_index - 1), result=result + data_size)
+    return (len + 1)
 end
 
 @view

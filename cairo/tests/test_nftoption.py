@@ -206,6 +206,51 @@ def event_loop():
     yield loop
     loop.close()
 
+@pytest.mark.asyncio
+async def test_view_bids(erc721_minted):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+    
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
+
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
+
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[0]),
+            *PREMIUM,
+            *BID,
+        ])
+    assert tx_exec_info.result.response == [0]
+
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[1]),
+            *PREMIUM,
+            *BID,
+        ])
+
+    assert tx_exec_info.result.response == [1]
+    BID_ID = tx_exec_info.result.response[0]
+
+    execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
+    print(f" view_bids_buyer results to {execution_info1.result}")
+
+    execution_info1 = await erc721Option.view_bids_seller(account1.contract_address).call()
+    print(f" view_bids_seller results to {execution_info1.result}")
+
+    execution_info1 = await erc721Option.view_bids_count().call()
+    print(f"view_bids_count results to {execution_info1.result.bids_count}")
+    assert execution_info1.result.bids_count == 2
+
+    execution_info1 = await erc721Option.view_all_bids().call()
+    print(f"view_bids_all results to {execution_info1.result}")
+    assert len(execution_info1.result.bids) == 2
 
 @pytest.mark.asyncio
 async def test_open_bid(erc721_minted):
@@ -293,8 +338,6 @@ async def test_expiry_time(erc721_minted):
             *(TOKENS[0]),
             *PREMIUM,
             *BID,
-            # NULL_BUYERS_ADDRESS,
-            # NULL_SELLERS_ADDRESS
         ])
     assert tx_exec_info.result.response == [0]
     BID_ID = tx_exec_info.result.response[0]
@@ -306,18 +349,4 @@ async def test_expiry_time(erc721_minted):
         account2, erc721Option.contract_address, 'register_put_sell', [
         tx_exec_info.result.response[0]])
     , reverted_with="current time is past the expiry date of the option")
-
-    # tx_exec_info = await signer.send_transaction(
-    # account1, erc721Option.contract_address, 'register_put_bid', [
-    #     EXPIRY_DATE,
-    #     erc721.contract_address,
-    #     *(TOKENS[1]),
-    #     *PREMIUM,
-    #     *BID,
-    #     # NULL_BUYERS_ADDRESS,
-    #     # NULL_SELLERS_ADDRESS
-    # ])
-
-    # assert tx_exec_info.result.response == [1]
-    # BID_ID = tx_exec_info.result.response[0]
 
