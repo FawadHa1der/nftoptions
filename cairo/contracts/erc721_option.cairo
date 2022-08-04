@@ -114,8 +114,6 @@ end
 @constructor
 func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
     # DO NOT CALL USE CONSTRUCTOR, USE INITIALIZER
-    # temp use until we know we can use view methods without using invok/transaction
-    # premium_token_address.write(_premium_token_address)
     return ()
 end
 
@@ -157,6 +155,11 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
         bid_id=current_index,
         params=bid,
     )
+    # let balance : Uint256 = IERC20.balanceOf(
+    #     contract_address=_premium_token_address, account=option_contract_address
+    # )
+
+    # %{ print(f' register_put_bid IERC20.balanceOf :{ids.option_contract_address}    {ids.balance.low} ') %}
 
     bids.write(current_index, bid_to_write)
     bids_count.write(new_index)
@@ -209,12 +212,15 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
             params=bid.params,
         )
         bids.write(bid_id_, bid_to_write)
+        # let balance : Uint256 = IERC20.balanceOf(
+        #     contract_address=_premium_token_address, account=option_contract_address
+        # )
 
-        IERC20.transferFrom(
-            contract_address=_premium_token_address,
-            sender=option_contract_address,
-            recipient=caller_address,
-            amount=option_premium,
+        # %{ print(f'IERC20.balanceOf :{ids.option_contract_address}    {ids.balance.low} ') %}
+        # %{ print(f'OptionPremium :{ids.option_contract_address}    {ids.option_premium.low} ') %}
+
+        IERC20.transfer(
+            contract_address=_premium_token_address, recipient=caller_address, amount=option_premium
         )
 
         IERC721.transferFrom(
@@ -278,9 +284,8 @@ func settle_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
         )
         bids.write(bid_id_, bid_to_write)
 
-        IERC20.transferFrom(
+        IERC20.transfer(
             contract_address=_premium_token_address,
-            sender=option_contract_address,
             recipient=bid.seller_address,
             amount=bid.params.strike_price,
         )

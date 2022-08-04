@@ -16,10 +16,11 @@ import withSuspense from 'hooks/withSuspense'
 import { ACTION_CARD_WIDTH } from 'pages'
 import React, { useState } from 'react'
 import { MarginProps } from 'styled-system'
+import { starknet } from 'utils/blockchain'
 import { sendTransaction, waitForTransaction } from 'utils/blockchain/starknet'
 import formatDate from 'utils/formatDate'
 import formatUSD from 'utils/formatUSD'
-
+import { getStarknet } from 'get-starknet'
 type Props = {
   put: PutDataWithNFT
   onTransact?: () => void
@@ -33,7 +34,7 @@ const ExerciseCard = withSuspense(
       setIsLoading(true)
       try {
         const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'exercise_put', { bid_id: put.bid_id })
-        await waitForTransaction(tx.transaction_hash)
+        await getStarknet().provider.waitForTransaction(tx.transaction_hash)
         setIsLoading(false)
         if (onTransact) {
           onTransact()
@@ -50,7 +51,7 @@ const ExerciseCard = withSuspense(
       setIsLoading(true)
       try {
         const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'cancel_put_bid', { bid_id: put.bid_id })
-        await waitForTransaction(tx.transaction_hash)
+        await getStarknet().provider.waitForTransaction(tx.transaction_hash)
         setIsLoading(false)
         if (onTransact) {
           onTransact()
