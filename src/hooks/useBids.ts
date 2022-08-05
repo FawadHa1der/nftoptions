@@ -16,8 +16,9 @@ export interface PutData {
   status: number
   bid_id: string
 
-  isExpiredButNotSettled(): boolean
-  isExpiredButOpen(): boolean
+  isActiveAndExpired(): boolean
+  isOpenAndExpired(): boolean
+
 }
 
 export enum PutStatus {
@@ -46,11 +47,11 @@ export async function fetcher(): Promise<PutData[]> {
         seller_address: option.seller_address.toString(16),
         status: option.status.toNumber(),
         bid_id: option.bid_id.toString(10),
-        isExpiredButNotSettled() {
-          return (this.status == PutStatus.ACTIVE && parseInt(this.expiry_date) < ((Math.floor(Date.now() / 1000) + 86400)))
+        isActiveAndExpired() {
+          return (this.status == PutStatus.ACTIVE && (parseInt(this.expiry_date) + 86400) < ((Math.floor(Date.now() / 1000))))
         },
-        isExpiredButOpen() {
-          return (this.status == PutStatus.OPEN && parseInt(this.expiry_date) < ((Math.floor(Date.now() / 1000) + 86400)))
+        isOpenAndExpired() {
+          return (this.status == PutStatus.OPEN && parseInt(this.expiry_date) < ((Math.floor(Date.now() / 1000))))
         }
       }
       console.log(data)

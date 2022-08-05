@@ -5,6 +5,7 @@ import Grid from 'components/common/Grid'
 import Spinner from 'components/common/Spinner'
 import Text from 'components/common/Text'
 import SellCard from 'components/sell_gallery/SellCard'
+import { PutStatus } from 'hooks/useBids'
 import { NFTData } from 'hooks/useMyNFTs'
 import useMyShortPuts from 'hooks/useMyShortPuts'
 import usePuts, { PutDataWithNFT } from 'hooks/usePuts'
@@ -17,11 +18,17 @@ const SellGallery = withSuspense(
     const [myPuts, mutateMyShortPuts] = useMyShortPuts()
     const [selectedOpenPut, setSelectedOpenPut] = useState<PutDataWithNFT | null>(null)
 
-    const handleClickNFT = (nftData: NFTData, option: any) => {
+    const handleClickNFT = (nftData: NFTData, option?: PutDataWithNFT) => {
       if (selectedOpenPut?.nftData.token_id === nftData.token_id) {
         setSelectedOpenPut(null)
       } else {
-        setSelectedOpenPut(nftData && option)
+        // active and expired bids should be able to settle by the seller or buyer.
+        // or if the bis is open and not expired to be able to sell it.
+        if (option?.isOpenAndExpired() == false) {
+          if (option?.isActiveAndExpired() == true || option?.status == PutStatus.OPEN) {
+            setSelectedOpenPut(nftData && option!!)
+          }
+        }
       }
     }
 
@@ -38,7 +45,9 @@ const SellGallery = withSuspense(
                 sx={{ gridTemplateColumns: `repeat(auto-fill, minmax(240px, 1fr))`, columnGap: 6, rowGap: 6 }}
               >
                 {myPuts.map(put => (
-                  <GalleryCard key={put.bid_id} nftData={put.nftData} option={put} />
+                  <GalleryCard key={put.bid_id} nftData={put.nftData} option={put} isSelected={selectedOpenPut?.bid_id === put.bid_id}
+                    onClick={handleClickNFT}
+                  />
                 ))}
               </Grid>
             </Box>

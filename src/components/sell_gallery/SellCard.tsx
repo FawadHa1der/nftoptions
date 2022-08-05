@@ -88,7 +88,7 @@ const SellCard = withSuspense(
             }
           />
           <SellButton mt={8} put={put} strike_price={strike_price}
-            onTransact={onTransact} isDisabled={put.status === PutStatus.ACTIVE} />
+            onTransact={onTransact} isDisabled={put.status === PutStatus.ACTIVE && put.isActiveAndExpired() == false} />
           <Link target="_blank" mx="auto" variant="secondary" mt={4} showRightIcon href={nftData.aspect_link}>
             View NFT on Aspect
           </Link>

@@ -51,7 +51,7 @@ const BuyGallery = withSuspense(
           {myLongPuts.length > 0 ? (
             <Box mb={8}>
               <Text ml={6} mb={4} variant="heading">
-                My Puts
+                My Bids
               </Text>
               <Grid
                 width="100%"

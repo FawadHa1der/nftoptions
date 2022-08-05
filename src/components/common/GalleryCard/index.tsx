@@ -27,9 +27,9 @@ type Props = {
 const getTokenLabel = (option: PutDataWithNFT) => {
   switch (option.status) {
     case PutStatus.OPEN:
-      return 'Offered'
+      return option.isOpenAndExpired() ? 'Unfilled but Past Expiry' : 'Offered';
     case PutStatus.ACTIVE:
-      return option.isExpiredButNotSettled() ? 'Expired' : 'Filled';
+      return option.isActiveAndExpired() ? 'Filled but Past Expiry' : 'Filled';
     case PutStatus.SETTLED:
       return 'Settled'
     case PutStatus.CANCELLED:
@@ -37,12 +37,12 @@ const getTokenLabel = (option: PutDataWithNFT) => {
   }
 }
 
-const getTokenVariant = (optionStatus: PutStatus) => {
-  switch (optionStatus) {
+const getTokenVariant = (option: PutDataWithNFT) => {
+  switch (option.status) {
     case PutStatus.OPEN:
-      return 'default'
+      return option.isOpenAndExpired() ? 'error' : 'default'
     case PutStatus.ACTIVE:
-      return 'primary'
+      return option.isActiveAndExpired() ? 'error' : 'primary';
 
     default: return 'error'
   }
@@ -97,7 +97,7 @@ export default function GalleryCard({ nftData, option, onClick: handleClick, isS
               {formatUSD(parseInt(option.strike_price), 0)} PUT Exp. {formatDate(parseInt(option.expiry_date), true)}
             </Text>
             <Flex mt={4}>
-              <Token label={getTokenLabel(option)} variant={getTokenVariant(option.status)} />
+              <Token label={getTokenLabel(option)} variant={getTokenVariant(option)} />
               <Token ml={2} label={formatUSD(parseInt(option.premium))} variant="primary" />
             </Flex>
           </Flex>

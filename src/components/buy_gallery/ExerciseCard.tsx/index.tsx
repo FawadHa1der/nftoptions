@@ -134,10 +134,10 @@ const ExerciseCard = withSuspense(
           <Button
             mt={8}
             isLoading={isLoading}
-            label={isCancellable ? "Cancel my bid" : (put.isExpiredButNotSettled() ? "Settle Put" : "Exercise Put")}
+            label={isCancellable ? "Cancel my bid" : (put.isActiveAndExpired() ? "Settle Put" : "Exercise Put")}
             variant="primary"
             size="large"
-            onClick={isCancellable ? handleClickCancel : (put.isExpiredButNotSettled() ? handleClickSettle : handleClickExercise)}
+            onClick={isCancellable ? handleClickCancel : (put.isActiveAndExpired() ? handleClickSettle : handleClickExercise)}
           />
           <Link target="_blank" mx="auto" variant="secondary" mt={4} showRightIcon href={nftData.aspect_link}>
             View NFT on Aspect

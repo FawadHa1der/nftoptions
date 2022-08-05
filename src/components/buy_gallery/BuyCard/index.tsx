@@ -30,10 +30,10 @@ function formatToDateString(date: Date) {
 
 const BuyCard = withSuspense(
   ({ nftData, onTransact, ...styleProps }: Props) => {
-    const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000
+    const threeDaysAhead = new Date().getTime() + 3 * 24 * 60 * 60 * 1000
     const balance = useBalance()
     const [strikePrice, setStrikePrice] = useState<string>('')
-    const [expiry, setExpiry] = useState<string>(formatToDateString(new Date(tomorrow)))
+    const [expiry, setExpiry] = useState<string>(formatToDateString(new Date(threeDaysAhead)))
     const expiryTimestamp = useMemo(() => {
       return new Date(expiry).setHours(23, 59) / 1000
     }, [expiry])

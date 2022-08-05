@@ -22,11 +22,27 @@ type Props = {
 
 const SellButton = withSuspense(
   ({ put, onTransact, strike_price, isDisabled = false, ...styleProps }: Props) => {
-    const [isERC20Approved, mutate] = useIsERC20Approved()
+    // const [isERC20Approved, mutate] = useIsERC20Approved()
     const [isLoading, setIsLoading] = useState(false)
     const address = useWallet()
     // const strikePriceUint256 = getUint256CalldataFromBN(strike_price.toString())
 
+    const handleClickSettle = async () => {
+      setIsLoading(true)
+      try {
+        const tx = await sendTransaction(OPTIONS_CONTRACT_INSTANCE, 'settle_put_bid', { bid_id: put.bid_id })
+        await getStarknet().provider.waitForTransaction(tx.transaction_hash)
+        setIsLoading(false)
+        if (onTransact) {
+          onTransact()
+        }
+      } catch (e) {
+        console.error(e)
+        setIsLoading(false)
+        return
+      }
+      createToast({ description: 'Your bid has been settled', variant: 'success' })
+    }
 
     const handleClickSell = async () => {
       try {
@@ -93,10 +109,10 @@ const SellButton = withSuspense(
         {...styleProps}
         isDisabled={isDisabled}
         isLoading={isLoading}
-        label={isERC20Approved ? 'Sell Put' : 'Approve'}
+        label={put.isActiveAndExpired() ? 'Settle Put' : 'Sell Put'}
         variant="primary"
         size="large"
-        onClick={handleClickSell}
+        onClick={put.isActiveAndExpired() ? handleClickSettle : handleClickSell}
       />
     )
   },

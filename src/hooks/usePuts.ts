@@ -16,7 +16,7 @@ type FetcherProps = {
 
 async function fetcher({ bids, address }: FetcherProps): Promise<PutDataWithNFT[]> {
   const openActivePuts: PutData[] = bids.filter(
-    bid => bid.status === PutStatus.OPEN && (!address || bid.buyer_address !== address.replace('0x', ''))
+    bid => bid.status === PutStatus.OPEN && (!address || bid.buyer_address !== address.replace('0x', '') && bid.isOpenAndExpired() == false)
   )
 
   const nfts = await Promise.all(
