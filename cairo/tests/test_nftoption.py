@@ -17,7 +17,6 @@ from utils import (
     TRUE, get_contract_def, cached_contract, assert_revert, assert_event_emitted, contract_path
 )
 
-epoch_time = int(time.time())
 
 CONTRACT_FILE = os.path.join("contracts", "erc721_option.cairo")
 
@@ -35,13 +34,13 @@ RECIPIENT = 555
 DATA = [0x42, 0x89, 0x55]
 # selector id
 ENUMERABLE_INTERFACE_ID = 0x780e9d63
-EXPIRY_DATE = epoch_time + (3*86400) # 3 days from now
 BID = uint(10000)
 PREMIUM = uint(5000)
 NULL_BUYERS_ADDRESS = 734597439539
 NULL_SELLERS_ADDRESS = 4758947594379
 DEFAULT_TIMESTAMP = 1640991600
 ONE_DAY = 86400
+
 
 
 def get_oz_lib_def(path):
@@ -80,6 +79,10 @@ DECIMALS = 18
 
 
 @pytest.fixture(scope='module')
+def event_loop():
+    return asyncio.new_event_loop()
+
+@pytest.fixture
 async def erc721_init(contract_defs):
     account_def, erc20_def, erc721_def, erc721Option_def = contract_defs
 
@@ -124,36 +127,6 @@ async def erc721_init(contract_defs):
         ]
     )
 
-    return (
-        starknet,
-        starknet.state,
-        account1,
-        account2,
-        erc721,
-        erc20,
-        erc721Option
-    )
-
-
-@pytest.fixture(scope='module')
-async def erc721_factory(contract_defs, erc721_init):
-    account_def, erc20_def, erc721_def, erc721Option_def = contract_defs
-    starknet, state, account1, account2, erc721, erc20, erc721Option = await erc721_init
-    _state = state.copy()
-    starknet.state = _state
-    account1 = cached_contract(_state, account_def, account1)
-    account2 = cached_contract(_state, account_def, account2)
-    erc721 = cached_contract(_state, erc721_def, erc721)
-    erc20 = cached_contract(_state, erc20_def, erc20)
-    erc721Option = cached_contract(_state, erc721Option_def, erc721Option)
-
-    return starknet, account1, account2, erc721, erc20, erc721Option
-
-
-@pytest.fixture(scope='module')
-async def erc721_minted(erc721_factory):
-    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
-    # mint tokens to account
     for token in TOKENS:
         await signer.send_transaction(
             account1, erc721.contract_address, 'mint', [
@@ -188,7 +161,71 @@ async def erc721_minted(erc721_factory):
         account1.contract_address, erc20.contract_address]
     )
 
+    return (
+        starknet,
+        starknet.state,
+        account1,
+        account2,
+        erc721,
+        erc20,
+        erc721Option
+    )
+
+
+@pytest.fixture
+async def erc721_factory(contract_defs, erc721_init):
+    account_def, erc20_def, erc721_def, erc721Option_def = contract_defs
+    starknet, state, account1, account2, erc721, erc20, erc721Option = await erc721_init
+    _state = state.copy()
+    starknet.state = _state
+    account1 = cached_contract(_state, account_def, account1)
+    account2 = cached_contract(_state, account_def, account2)
+    erc721 = cached_contract(_state, erc721_def, erc721)
+    erc20 = cached_contract(_state, erc20_def, erc20)
+    erc721Option = cached_contract(_state, erc721Option_def, erc721Option)
+
     return starknet, account1, account2, erc721, erc20, erc721Option
+
+
+# @pytest.fixture
+# async def erc721_minted(erc721_factory):
+#     starknet, account1, account2, erc721, erc20, erc721Option = erc721_factory
+#     # mint tokens to account
+#     for token in TOKENS:
+#         await signer.send_transaction(
+#             account1, erc721.contract_address, 'mint', [
+#                 account1.contract_address, *token]
+#         )
+#         await signer.send_transaction(
+#             account1, erc721.contract_address, 'approve', [
+#                 erc721Option.contract_address, *token]
+#         )
+
+#     # return_bool = await signer.send_transaction(account1, erc20Weth.contract_address, 'approve', [ricks.contract_address, *bid_256])
+
+#     await signer.send_transaction(
+#         account1, erc20.contract_address, 'approve', [
+#             erc721Option.contract_address,
+#             *to_uint(10000000)
+#         ])
+
+#     await signer.send_transaction(
+#         account2, erc20.contract_address, 'approve', [
+#             erc721Option.contract_address,
+#             *to_uint(10000000)
+#         ])
+
+#     await signer.send_transaction(
+#         account1, erc20.contract_address, 'transfer', [
+#             account2.contract_address,
+#             *to_uint(400000)
+#         ])
+#     await signer.send_transaction(
+#     account1, erc721Option.contract_address, 'initializer', [
+#         account1.contract_address, erc20.contract_address]
+#     )
+
+#     return starknet, account1, account2, erc721, erc20, erc721Option
 
 
 
@@ -200,15 +237,10 @@ def update_starknet_block(starknet, block_number=1, block_timestamp= ONE_DAY):
         starknet_version=starknet.state.state.block_info.starknet_version )
 
 
-@pytest.fixture(scope="module")
-def event_loop():
-    loop = asyncio.get_event_loop()
-    yield loop
-    loop.close()
 
 @pytest.mark.asyncio
-async def test_cancel_bid(erc721_minted):
-    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+async def test_cancel_bid(erc721_factory):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
     
     execution_info = await erc20.balanceOf(account1.contract_address).call()
     initialAccount1Balance = execution_info.result.balance[0]
@@ -259,147 +291,147 @@ async def test_cancel_bid(erc721_minted):
     assert tx_exec_info.result.response == [1]
 
 
-# @pytest.mark.asyncio
-# async def test_view_bids(erc721_minted):
-#     starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+@pytest.mark.asyncio
+async def test_view_bids(erc721_factory):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
     
-#     execution_info = await erc20.balanceOf(account1.contract_address).call()
-#     initialAccount1Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(account2.contract_address).call()
-#     initialAccount2Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
 
-#     tx_exec_info = await signer.send_transaction(
-#         account1, erc721Option.contract_address, 'register_put_bid', [
-#             DEFAULT_TIMESTAMP + (ONE_DAY * 3),
-#             erc721.contract_address,
-#             *(TOKENS[0]),
-#             *PREMIUM,
-#             *BID,
-#         ])
-#     assert tx_exec_info.result.response == [0]
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[0]),
+            *PREMIUM,
+            *BID,
+        ])
+    assert tx_exec_info.result.response == [0]
 
-#     tx_exec_info = await signer.send_transaction(
-#         account1, erc721Option.contract_address, 'register_put_bid', [
-#             DEFAULT_TIMESTAMP + (ONE_DAY * 3),
-#             erc721.contract_address,
-#             *(TOKENS[1]),
-#             *PREMIUM,
-#             *BID,
-#         ])
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[1]),
+            *PREMIUM,
+            *BID,
+        ])
 
-#     assert tx_exec_info.result.response == [1]
-#     BID_ID = tx_exec_info.result.response[0]
+    assert tx_exec_info.result.response == [1]
+    BID_ID = tx_exec_info.result.response[0]
 
-#     execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
-#     print(f" view_bids_buyer results to {execution_info1.result}")
+    execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
+    print(f" view_bids_buyer results to {execution_info1.result}")
 
-#     execution_info1 = await erc721Option.view_bids_seller(account1.contract_address).call()
-#     print(f" view_bids_seller results to {execution_info1.result}")
+    execution_info1 = await erc721Option.view_bids_seller(account1.contract_address).call()
+    print(f" view_bids_seller results to {execution_info1.result}")
 
-#     execution_info1 = await erc721Option.view_bids_count().call()
-#     print(f"view_bids_count results to {execution_info1.result.bids_count}")
-#     assert execution_info1.result.bids_count == 2
+    execution_info1 = await erc721Option.view_bids_count().call()
+    print(f"view_bids_count results to {execution_info1.result.bids_count}")
+    assert execution_info1.result.bids_count == 2
 
-#     execution_info1 = await erc721Option.view_all_bids().call()
-#     print(f"view_bids_all results to {execution_info1.result}")
-#     assert len(execution_info1.result.bids) == 2
+    execution_info1 = await erc721Option.view_all_bids().call()
+    print(f"view_bids_all results to {execution_info1.result}")
+    assert len(execution_info1.result.bids) == 2
 
-# @pytest.mark.asyncio
-# async def test_open_bid(erc721_minted):
-#     starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+@pytest.mark.asyncio
+async def test_open_bid(erc721_factory):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
     
-#     execution_info = await erc20.balanceOf(account1.contract_address).call()
-#     initialAccount1Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(account2.contract_address).call()
-#     initialAccount2Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
 
-#     tx_exec_info = await signer.send_transaction(
-#         account1, erc721Option.contract_address, 'register_put_bid', [
-#             DEFAULT_TIMESTAMP + (ONE_DAY * 3),
-#             erc721.contract_address,
-#             *(TOKENS[0]),
-#             *PREMIUM,
-#             *BID,
-#         ])
-#     assert tx_exec_info.result.response == [0]
-#     BID_ID = tx_exec_info.result.response[0]
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[0]),
+            *PREMIUM,
+            *BID,
+        ])
+    assert tx_exec_info.result.response == [0]
+    BID_ID = tx_exec_info.result.response[0]
 
-#     execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
-#     print(f"results to {execution_info1.result}")
+    execution_info1 = await erc721Option.view_bids_buyer(account1.contract_address).call()
+    print(f"results to {execution_info1.result}")
 
-#     execution_info1 = await erc721Option.view_bids_seller(account1.contract_address).call()
-#     print(f"results to {execution_info1.result}")
+    execution_info1 = await erc721Option.view_bids_seller(account1.contract_address).call()
+    print(f"results to {execution_info1.result}")
 
-#     execution_info = await erc20.balanceOf(account1.contract_address).call()
-#     assert initialAccount1Balance - PREMIUM[0]  == execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    assert initialAccount1Balance - PREMIUM[0]  == execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
-#     assert PREMIUM[0]  == execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
+    assert PREMIUM[0]  == execution_info.result.balance[0]
 
-#     tx_exec_info = await signer.send_transaction(
-#         account2, erc721Option.contract_address, 'register_put_sell', [
-#         tx_exec_info.result.response[0]])
-#     assert tx_exec_info.result.response == [1]
+    tx_exec_info = await signer.send_transaction(
+        account2, erc721Option.contract_address, 'register_put_sell', [
+        tx_exec_info.result.response[0]])
+    assert tx_exec_info.result.response == [1]
 
-#     execution_info = await erc20.balanceOf(account2.contract_address).call()
-#     assert initialAccount2Balance - BID[0] + PREMIUM[0] == execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    assert initialAccount2Balance - BID[0] + PREMIUM[0] == execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
-#     assert BID[0] == execution_info.result.balance[0]
-#     execution_info = await erc721.ownerOf(TOKENS[0]).call()
-#     print(f"before exercise put erc721.ownerOf(TOKENS[0]).call() {execution_info.result.owner}")
+    execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
+    assert BID[0] == execution_info.result.balance[0]
+    execution_info = await erc721.ownerOf(TOKENS[0]).call()
+    print(f"before exercise put erc721.ownerOf(TOKENS[0]).call() {execution_info.result.owner}")
  
-#     tx_exec_info = await signer.send_transaction(
-#     account1, erc721Option.contract_address, 'exercise_put', [
-#     BID_ID])
-#     assert tx_exec_info.result.response == [1]
+    tx_exec_info = await signer.send_transaction(
+    account1, erc721Option.contract_address, 'exercise_put', [
+    BID_ID])
+    assert tx_exec_info.result.response == [1]
 
-#     execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
-#     assert 0 == execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(erc721Option.contract_address).call()
+    assert 0 == execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(account1.contract_address).call()
-#     assert initialAccount1Balance + BID[0] - PREMIUM[0] == execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    assert initialAccount1Balance + BID[0] - PREMIUM[0] == execution_info.result.balance[0]
 
-#     execution_info = await erc721.balanceOf(account1.contract_address).call()
-#     assert 4 == execution_info.result.balance[0]
+    execution_info = await erc721.balanceOf(account1.contract_address).call()
+    assert 4 == execution_info.result.balance[0]
 
-#     execution_info = await erc721.balanceOf(account2.contract_address).call()
-#     assert 1 == execution_info.result.balance[0]
+    execution_info = await erc721.balanceOf(account2.contract_address).call()
+    assert 1 == execution_info.result.balance[0]
 
-#     execution_info = await erc721.ownerOf(TOKENS[0]).call()
-#     print(f"erc721.ownerOf(TOKENS[0]).call() {execution_info.result.owner}")
-#     print(f"account2.contract_address {account2.contract_address}")
+    execution_info = await erc721.ownerOf(TOKENS[0]).call()
+    print(f"erc721.ownerOf(TOKENS[0]).call() {execution_info.result.owner}")
+    print(f"account2.contract_address {account2.contract_address}")
 
-#     assert account2.contract_address == execution_info.result.owner
+    assert account2.contract_address == execution_info.result.owner
 
-# @pytest.mark.asyncio
-# async def test_expiry_time(erc721_minted):
-#     starknet, account1, account2, erc721, erc20, erc721Option = await erc721_minted
+@pytest.mark.asyncio
+async def test_expiry_time(erc721_factory):
+    starknet, account1, account2, erc721, erc20, erc721Option = await erc721_factory
     
-#     execution_info = await erc20.balanceOf(account1.contract_address).call()
-#     initialAccount1Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account1.contract_address).call()
+    initialAccount1Balance = execution_info.result.balance[0]
 
-#     execution_info = await erc20.balanceOf(account2.contract_address).call()
-#     initialAccount2Balance = execution_info.result.balance[0]
+    execution_info = await erc20.balanceOf(account2.contract_address).call()
+    initialAccount2Balance = execution_info.result.balance[0]
 
-#     tx_exec_info = await signer.send_transaction(
-#         account1, erc721Option.contract_address, 'register_put_bid', [
-#             DEFAULT_TIMESTAMP + (ONE_DAY * 3),
-#             erc721.contract_address,
-#             *(TOKENS[0]),
-#             *PREMIUM,
-#             *BID,
-#         ])
-#     assert tx_exec_info.result.response == [0]
-#     BID_ID = tx_exec_info.result.response[0]
+    tx_exec_info = await signer.send_transaction(
+        account1, erc721Option.contract_address, 'register_put_bid', [
+            DEFAULT_TIMESTAMP + (ONE_DAY * 3),
+            erc721.contract_address,
+            *(TOKENS[0]),
+            *PREMIUM,
+            *BID,
+        ])
+    assert tx_exec_info.result.response == [0]
+    BID_ID = tx_exec_info.result.response[0]
 
-#     update_starknet_block(starknet, block_timestamp=DEFAULT_TIMESTAMP +(ONE_DAY * 4))
+    update_starknet_block(starknet, block_timestamp=DEFAULT_TIMESTAMP +(ONE_DAY * 4))
     
  
-#     await assert_revert(signer.send_transaction(
-#         account2, erc721Option.contract_address, 'register_put_sell', [
-#         tx_exec_info.result.response[0]])
-#     , reverted_with="current time is past the expiry date of the option")
+    await assert_revert(signer.send_transaction(
+        account2, erc721Option.contract_address, 'register_put_sell', [
+        tx_exec_info.result.response[0]])
+    , reverted_with="current time is past the expiry date of the option")
 

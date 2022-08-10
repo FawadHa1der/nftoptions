@@ -41,24 +41,6 @@ from starkware.starknet.common.syscalls import (
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.memcpy import memcpy
 
-@view
-func onERC721Received(
-    operator : felt, _from : felt, tokenId : Uint256, data_len : felt, data : felt*
-) -> (selector : felt):
-    # ERC721_RECEIVER_ID = 0x150b7a02
-    return (0x150b7a02)
-end
-
-@view
-func supportsInterface{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-    interfaceId : felt
-) -> (success : felt):
-    let (success) = ERC165.supports_interface(interfaceId)
-    return (success)
-end
-
-############################################################################
-
 namespace BidState:
     const OPEN = 1
     const CANCELLED = 2
@@ -481,7 +463,6 @@ func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
     alloc_locals
     let (__fp__, _) = get_fp_and_pc()
 
-    # let (local bid_searched_field : felt*) = bids.addr(bid_index)
     let (inputs) = alloc()
     assert inputs[0] = bid_index
 
@@ -517,6 +498,7 @@ func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
     return (len + found_put)
 end
 
+# ###########Proxy upgrade supported methods
 #
 # Initializer
 #
@@ -549,4 +531,21 @@ func getImplementationHash{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ran
 ):
     let (address) = Proxy.get_implementation_hash()
     return (address)
+end
+
+# ###########ERC165 Interface supported methods
+@view
+func onERC721Received(
+    operator : felt, _from : felt, tokenId : Uint256, data_len : felt, data : felt*
+) -> (selector : felt):
+    # ERC721_RECEIVER_ID = 0x150b7a02
+    return (0x150b7a02)
+end
+
+@view
+func supportsInterface{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+    interfaceId : felt
+) -> (success : felt):
+    let (success) = ERC165.supports_interface(interfaceId)
+    return (success)
 end
