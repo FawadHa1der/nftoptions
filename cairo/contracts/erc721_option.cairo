@@ -41,6 +41,8 @@ from starkware.starknet.common.syscalls import (
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.memcpy import memcpy
 
+# ### ONLY FOR DEMONSTRATION PURPOSES. HAS NOT BEEN AUDITED
+
 namespace BidState:
     const OPEN = 1
     const CANCELLED = 2
@@ -99,6 +101,9 @@ func constructor{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
     return ()
 end
 
+# To place a proposal/bid for a PUT on a NFT.
+# Param  ERC721PUT_PARAM : Specifies the expiry, ERC721 Contract address, ERC721 ID, premium the buyer is willing to pay, strike price for the PUT
+# return : returns the bid_id for the newly created bid
 @external
 func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     bid : ERC721PUT_PARAM
@@ -107,7 +112,6 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     let current_index : felt = bids_count.read()
     let new_index : felt = current_index + 1
 
-    # transfer the premium
     let _premium_token_address : felt = premium_token_address.read()
     let _erc721_token_address : felt = bid.erc721_address
     let _erc721_token_id : Uint256 = bid.erc721_id
@@ -116,6 +120,7 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     let option_contract_address : felt = get_contract_address()
     let option_premium : Uint256 = bid.premium
 
+    # first the option premium is transferred into the contract, then the NFT from the buyer of the put
     IERC20.transferFrom(
         contract_address=_premium_token_address,
         sender=caller_address,
@@ -137,17 +142,15 @@ func register_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
         bid_id=current_index,
         params=bid,
     )
-    # let balance : Uint256 = IERC20.balanceOf(
-    #     contract_address=_premium_token_address, account=option_contract_address
-    # )
-
-    # %{ print(f' register_put_bid IERC20.balanceOf :{ids.option_contract_address}    {ids.balance.low} ') %}
 
     bids.write(current_index, bid_to_write)
     bids_count.write(new_index)
     return (bid_id=current_index)
 end
 
+# To cancel a open/unfilled bid. This will return premium and NFT to the bid proposar. Can only be invoked by the buyer of the Bid.
+# Param  bid_id_ : the bid_id which was returned from register_put_bid
+# return : returns true on success or asserts.
 @external
 func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     bid_id_ : felt
@@ -202,9 +205,14 @@ func cancel_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
         tempvar pedersen_ptr = pedersen_ptr
         tempvar range_check_ptr = range_check_ptr
     end
-    return (success=TRUE)  # true or false
+    return (success=TRUE)
 end
 
+# If the bid has been filled but is past expiry + 24 hours. Then it cannot be exercised but ony settled.
+# The buyer will lose the premium but the NFT will go back to the buyer and strike_priec will go back to the seller.
+# This can be invoked by anyone.
+# Param  bid_id_ : the bid_id which was returned from register_put_bid, or the view_bids* view methods
+# return : returns true on success or asserts.
 @external
 func settle_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     bid_id_ : felt
@@ -269,8 +277,12 @@ func settle_put_bid{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
         tempvar pedersen_ptr = pedersen_ptr
         tempvar range_check_ptr = range_check_ptr
     end
-    return (success=TRUE)  # true or false
+    return (success=TRUE)
 end
+
+# This will fill the open bid and make it active. The strike price from the seller is transferred into the contract and the premium is transffered to the seller.
+# Param  bid_id_ : the bid_id which was returned from register_put_bid, or the view_bids* view methods
+# return : returns true on success or asserts.
 
 @external
 func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
@@ -287,8 +299,6 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     # %{ print(f'register_put_sell bid.buyer_address:{ids.bid.buyer_address} ') %}
     let (block_time_stamp : felt) = get_block_timestamp()
     let expiry_time : felt = bid.params.expiry_date
-    # %{ print(f'register_put_sell bid.params.expiry_date:{ids.bid.params.expiry_date} ') %}
-    # %{ print(f'register_put_sell block_time_stamp:{ids.block_time_stamp} ') %}
 
     with_attr error_message("current time is past the expiry date of the option"):
         assert_le(block_time_stamp, expiry_time)
@@ -320,9 +330,13 @@ func register_put_sell{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     )
 
     bids.write(bid_id_, bid_to_write)
-    # puts.write(bid_id, bid)
-    return (success=TRUE)  # true or false
+    return (success=TRUE)
 end
+
+# Only the buyer exercise the put/bid. The buyer can exercise at any point after the bid is filled upto (expiry date + 24 hours).
+# This will transfer the strike_price to the buyer and transfer the NFT to the Seller
+# Param  bid_id_ : the bid_id which was returned from register_put_bid, or the view_bids* view methods
+# return : returns true on success or asserts.
 
 @external
 func exercise_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
@@ -339,9 +353,6 @@ func exercise_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_
     with_attr error_message("internal data needs to be consistent"):
         assert bid.bid_id = bid_id_
     end
-
-    # %{ print(f'exercise_put bid.buyer_address:{ids.bid.buyer_address} ') %}
-    # %{ print(f'exercise_put caller_address:{ids.caller_address} ') %}
 
     with_attr error_message("You can only exercise your own bids"):
         assert bid.buyer_address = caller_address
@@ -383,6 +394,7 @@ func exercise_put{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_
     return (success=TRUE)  # true or false
 end
 
+# Gets a list of bids by a given user where the user is the buyer
 @view
 func view_bids_buyer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     user : felt
@@ -393,16 +405,13 @@ func view_bids_buyer{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_che
     let _bids_count : felt = bids_count.read()
     let (result : ERC721PUT*) = alloc()
 
-    # %{ print(f'ERC721PUT.SIZE:{ids.ERC721PUT.SIZE} ') %}
-    # %{ print(f'ERC721PUT.RESULT:{ids.result} ') %}
-    # %{ print(f'_bids_count:{ids._bids_count} ') %}
-
     let (result_len) = search_data(
         bid_index=_bids_count - 1, data=user, struct_index=ERC721PUT.buyer_address, result=result
     )
     return (result_len, result)
 end
 
+# Gets a list of all bids in the contract
 @view
 func view_all_bids{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
     bids_len : felt, bids : ERC721PUT*
@@ -412,10 +421,6 @@ func view_all_bids{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check
 
     let _bids_count : felt = bids_count.read()
     let (result : ERC721PUT*) = alloc()
-
-    # %{ print(f'ERC721PUT.SIZE:{ids.ERC721PUT.SIZE} ') %}
-    # %{ print(f'ERC721PUT.RESULT:{ids.result} ') %}
-    # %{ print(f'_bids_count:{ids._bids_count} ') %}
 
     let (result_len) = view_bid_recursive(bid_index=_bids_count - 1, result=result)
     return (result_len, result)
@@ -441,6 +446,7 @@ func view_bid_recursive{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_
     return (len + 1)
 end
 
+# Gets a list of bids by a given user where the user is the seller
 @view
 func view_bids_seller{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     user : felt
@@ -449,7 +455,6 @@ func view_bids_seller{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     let _bids_count : felt = bids_count.read()
     let (result : ERC721PUT*) = alloc()
 
-    # return (bids_count=_bids_count)
     let (result_len) = search_data(
         bid_index=_bids_count - 1, data=user, struct_index=ERC721PUT.seller_address, result=result
     )
@@ -457,6 +462,7 @@ func view_bids_seller{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     return (result_len, result)
 end
 
+# Search and make list for the bids satisfying the search criteria 
 func search_data{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     bid_index : felt, data : felt, struct_index : felt, result : ERC721PUT*
 ) -> (result_len : felt):

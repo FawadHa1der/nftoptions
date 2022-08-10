@@ -1,16 +1,16 @@
-# cairopal • [![Tests](https://github.com/fawadha1der/cairopal/actions/workflows/tests.yml/badge.svg)](https://github.com/fawadha1der/cairopal/actions/workflows/tests.yml) [![Lints](https://github.com/fawadha1der/cairopal/actions/workflows/lints.yml/badge.svg)](https://github.com/fawadha1der/cairopal/actions/workflows/lints.yml) ![GitHub](https://img.shields.io/github/license/fawadha1der/cairopal) ![GitHub package.json version](https://img.shields.io/github/package-json/v/fawadha1der/cairopal) ![Vercel Deployment](https://img.shields.io/github/deployments/fawadha1der/cairopal/production?label=vercel)
+# NFT Options 
 
-
-**Modern**, **Flexible** Starknet Dapp Template.
-
+Buy a PUT option on your expensive NFT on starknet(goerli). 
+Currently implemented using [TT tokens] (https://argentlabs.github.io/argent-x/)
+Continously deployed to this [netlify page] (https://taupe-pavlova-10f9b6.netlify.app/)
 
 ## Developing
 
 Clone the repository
 
 ```bash
-git clone git@github.com:fawadha1der/cairopal.git
-cd cairopal
+git clone https://github.com/FawadHa1der/nftoptions.git
+cd nftoptions/src
 ```
 
 Install Dependencies
@@ -25,19 +25,15 @@ Run locally
 yarn dev
 ```
 
-#### Run tests
-
-```bash
-yarn test
-```
 
 ## Acknowledgements
 
 - [StarkWare](https://starkware.co/)
 - [Starknet.js](https://github.com/seanjameshan/starknet.js)
 - [Argent-x](https://github.com/argentlabs/argent-x)
-- [Auclantis's starknet-react](https://github.com/auclantis/starknet-react)
 - [OpenZeppelin](https://github.com/OpenZeppelin/cairo-contracts)
+- [Aspect] (testnet.aspect.co) 
+- [Th0rgal] (https://github.com/Th0rgal/sphinx)
 
 ## Security
 
@@ -47,4 +43,4 @@ Please report any security issues you find by opening up an issue in this reposi
 
 ## License
 
-Cairopal Contracts are released under the [AGPL-3.0-only](LICENSE).# nftoptions
+NFTOptions Contracts are released under the [AGPL-3.0-only](LICENSE).# nftoptions

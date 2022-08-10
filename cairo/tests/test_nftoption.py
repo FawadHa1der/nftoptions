@@ -30,8 +30,6 @@ TOKENS = [
 TOTAL_TOKENS = to_uint(len(TOKENS))
 # random user address
 RECIPIENT = 555
-# random data (mimicking bytes in Solidity)
-DATA = [0x42, 0x89, 0x55]
 # selector id
 ENUMERABLE_INTERFACE_ID = 0x780e9d63
 BID = uint(10000)
@@ -41,6 +39,14 @@ NULL_SELLERS_ADDRESS = 4758947594379
 DEFAULT_TIMESTAMP = 1640991600
 ONE_DAY = 86400
 
+RECIPIENT = 123
+INIT_SUPPLY = to_uint(100000000)
+AMOUNT = to_uint(200)
+UINT_ONE = to_uint(1)
+UINT_ZERO = to_uint(0)
+NAME = str_to_felt("Token")
+SYMBOL = str_to_felt("TKN")
+DECIMALS = 18
 
 
 def get_oz_lib_def(path):
@@ -66,16 +72,6 @@ def contract_defs():
         'openzeppelin/token/erc721/ERC721_Mintable_Burnable.cairo')
 
     return account_def, erc20_def, erc721_def, erc721Option_def
-
-
-RECIPIENT = 123
-INIT_SUPPLY = to_uint(100000000)
-AMOUNT = to_uint(200)
-UINT_ONE = to_uint(1)
-UINT_ZERO = to_uint(0)
-NAME = str_to_felt("Token")
-SYMBOL = str_to_felt("TKN")
-DECIMALS = 18
 
 
 @pytest.fixture(scope='module')
@@ -107,11 +103,7 @@ async def erc721_init(contract_defs):
             account1.contract_address,        # recipient
         ]
     )
-    # await signer.send_transaction(
-    #     account1, erc20.contract_address, 'transfer', [
-    #         account2.contract_address,
-    #         *to_uint(40000)
-    #     ])
+
     erc721 = await starknet.deploy(
         contract_class=erc721_def,
         constructor_calldata=[
@@ -185,47 +177,6 @@ async def erc721_factory(contract_defs, erc721_init):
     erc721Option = cached_contract(_state, erc721Option_def, erc721Option)
 
     return starknet, account1, account2, erc721, erc20, erc721Option
-
-
-# @pytest.fixture
-# async def erc721_minted(erc721_factory):
-#     starknet, account1, account2, erc721, erc20, erc721Option = erc721_factory
-#     # mint tokens to account
-#     for token in TOKENS:
-#         await signer.send_transaction(
-#             account1, erc721.contract_address, 'mint', [
-#                 account1.contract_address, *token]
-#         )
-#         await signer.send_transaction(
-#             account1, erc721.contract_address, 'approve', [
-#                 erc721Option.contract_address, *token]
-#         )
-
-#     # return_bool = await signer.send_transaction(account1, erc20Weth.contract_address, 'approve', [ricks.contract_address, *bid_256])
-
-#     await signer.send_transaction(
-#         account1, erc20.contract_address, 'approve', [
-#             erc721Option.contract_address,
-#             *to_uint(10000000)
-#         ])
-
-#     await signer.send_transaction(
-#         account2, erc20.contract_address, 'approve', [
-#             erc721Option.contract_address,
-#             *to_uint(10000000)
-#         ])
-
-#     await signer.send_transaction(
-#         account1, erc20.contract_address, 'transfer', [
-#             account2.contract_address,
-#             *to_uint(400000)
-#         ])
-#     await signer.send_transaction(
-#     account1, erc721Option.contract_address, 'initializer', [
-#         account1.contract_address, erc20.contract_address]
-#     )
-
-#     return starknet, account1, account2, erc721, erc20, erc721Option
 
 
 
