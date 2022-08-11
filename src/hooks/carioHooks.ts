@@ -7,6 +7,7 @@ import optionsCompiledContract from '../compiledcairo/erc721_option.json'
 import { PutData, PutStatus } from './useBids'
 import { fetcher, NFTData } from './useMyNFTs'
 
+// This is proxy contract address
 const optionsContractAddress = '0x048a64f708011fb5089778204f37d6111bd9bbac0fe4b6e7851292b8cbeeb6ef'
 
 const bidsCache: PutData[] = []
@@ -16,7 +17,6 @@ export async function getAllBidsTest(): Promise<PutData[]> {
   console.log('!'.repeat(100))
   const optioncontract = createContract(optionsContractAddress, optionsCompiledContract.abi)
   const all_bids = await callContract(optioncontract, 'view_all_bids')
-  console.log('UN MAPPED all data  ---> ' + JSON.stringify(all_bids))
   const mapped_all_bids: PutData[] = []
   if (all_bids.length > 0) {
 
@@ -46,7 +46,7 @@ export async function getAllBidsTest(): Promise<PutData[]> {
 
 
   bidsCache.push(...mapped_all_bids)
-  console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
+  // console.log('mapped all data  ---> ' + JSON.stringify(mapped_all_bids))
   return mapped_all_bids
 }
 
