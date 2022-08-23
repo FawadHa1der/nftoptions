@@ -27,6 +27,9 @@ type Props = {
 function formatToDateString(date: Date) {
   return date.toISOString().split('T')[0]
 }
+function isItNumber(str: string) {
+  return /^-?\d+$/.test(str);
+}
 
 const BuyCard = withSuspense(
   ({ nftData, onTransact, ...styleProps }: Props) => {
@@ -40,7 +43,11 @@ const BuyCard = withSuspense(
     // const [premium, setPremium] = useState<BigNumber>(ZERO_BN)
     const [premium, setPremium] = useState<string>('')
     const expiryTooEarly = useMemo(() => expiryTimestamp < new Date().getTime() / 1000, [expiryTimestamp])
-    const isDisabled = isNaN(parseInt(strikePrice)) || isNaN(parseInt(premium)) || expiryTooEarly
+
+    function isFormValid() {
+      return isItNumber(strikePrice) && isItNumber(premium) && !expiryTooEarly
+    }
+
 
     if (!nftData) {
       return (
@@ -72,8 +79,13 @@ const BuyCard = withSuspense(
                 width={INPUT_WIDTH}
                 ml="auto"
                 value={strikePrice}
-                onChange={(evt: any) => setStrikePrice(evt.target.value)}
+                onChange={(evt: any) => {
+                  setStrikePrice(evt.target.value)
+                }}
                 textAlign="right"
+                error={
+                  (isNaN(parseInt(strikePrice)) || (parseInt(strikePrice) < 1) || (isItNumber(strikePrice) === false)) ? 'Strike price must be greater than zero integer value' : false
+                }
               ></Input>
             </Flex>
             <Flex mt={4} alignItems="center">
@@ -98,7 +110,12 @@ const BuyCard = withSuspense(
                 width={INPUT_WIDTH}
                 ml="auto"
                 value={premium}
-                onChange={(evt: any) => setPremium(evt.target.value)}
+                onChange={(evt: any) => {
+                  setPremium(evt.target.value)
+                }}
+                error={
+                  (isNaN(parseInt(premium)) || (parseInt(premium) < 1) || (isItNumber(premium) == false)) ? 'Premium must be greater than zero integer value' : false
+                }
                 textAlign="right"
               />
             </Flex>
@@ -111,7 +128,7 @@ const BuyCard = withSuspense(
                 isUSDFormat
               />
             </Flex>
-            {!isDisabled ? (
+            {isFormValid() ? (
               <Alert
                 mt={6}
                 textAlign="center"
@@ -132,7 +149,7 @@ const BuyCard = withSuspense(
             ) : null}
             <BuyButton
               mt={8}
-              isDisabled={isDisabled}
+              isDisabled={isFormValid() === false}
               nftData={nftData}
               strikePrice={strikePrice}
               expiryTimestamp={expiryTimestamp}

@@ -35,6 +35,7 @@ yarn dev
 - [Argent-x](https://github.com/argentlabs/argent-x)
 - [OpenZeppelin](https://github.com/OpenZeppelin/cairo-contracts)
 - [Aspect] (testnet.aspect.co) 
+- [cairopal] (https://github.com/sambarnes/cairopal)
 - [Th0rgal] (https://github.com/Th0rgal/sphinx)
 
 ## Security

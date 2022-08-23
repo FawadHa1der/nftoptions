@@ -27,14 +27,15 @@ const BuyButton = withSuspense(
   ({ nftData, strikePrice, premium, expiryTimestamp, isDisabled, onTransact, ...styleProps }: Props) => {
     const { contract_address, token_id } = nftData
     const address = useWallet()
-    const strikePriceUint256 = getUint256CalldataFromBN(strikePrice.toString())
-    const erc721_id = getUint256CalldataFromBN(nftData.token_id)
-    const premiumUint256 = getUint256CalldataFromBN(premium.toString())
     const isERC721Approved = useIsERC721Approved(contract_address, token_id)
 
     const [isLoading, setIsLoading] = useState(false)
 
     async function handleClickBuy() {
+      const strikePriceUint256 = getUint256CalldataFromBN(strikePrice.toString())
+      const erc721_id = getUint256CalldataFromBN(nftData.token_id)
+      const premiumUint256 = getUint256CalldataFromBN(premium.toString())
+
       setIsLoading(true)
       const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
@@ -108,7 +109,7 @@ const BuyButton = withSuspense(
       <Button
         {...styleProps}
         isLoading={isLoading}
-        isDisabled={isERC721Approved && isDisabled}
+        isDisabled={isDisabled}
         label={'Buy PUT'}
         variant="primary"
         size="lg"
