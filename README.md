@@ -1,10 +1,11 @@
 # NFT Options 
 
+Continously deployed to this [netlify page] (https://lyra-nft-put-demo.netlify.app/)
+
 Buy a PUT option on your expensive NFT on starknet(goerli). 
 
 Currently implemented using [TT tokens] (https://argentlabs.github.io/argent-x/)
 
-Continously deployed to this [netlify page] (https://taupe-pavlova-10f9b6.netlify.app/)
 
 ## Developing
 
