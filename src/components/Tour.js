@@ -42,6 +42,15 @@ const TOUR_STEPS = [
         placement: "center"
 
     },
+    {
+        target: "body",
+        content: (
+            <div>
+                A little explanatory <a href="https://www.youtube.com/watch?v=r09Ev0P5KEM">intro video</a>
+            </div>
+        ),
+        placement: "center"
+    }
 ];
 
 const INITIAL_STATE = {
