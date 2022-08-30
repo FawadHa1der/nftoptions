@@ -3,6 +3,7 @@ import Button from 'components/common/Button'
 import ButtonShimmer from 'components/common/Shimmer/ButtonShimmer'
 import { createToast } from 'components/common/Toast'
 import { ERC20_CONTRACT_INSTANCE, OPTIONS_CONTRACT_ADDRESS, OPTIONS_CONTRACT_INSTANCE } from 'constants/contracts'
+import { bn } from 'date-fns/locale'
 import { getStarknet } from 'get-starknet'
 import useIsERC721Approved from 'hooks/useIsERC721Approved'
 import { NFTData } from 'hooks/useMyNFTs'
@@ -13,6 +14,7 @@ import { Contract, uint256 } from 'starknet'
 import { MarginProps } from 'styled-system'
 import { callContract, constructTransaction, sendTransaction, sendTransactions } from 'utils/blockchain/starknet'
 import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
+import { BN } from 'bn.js'
 
 type Props = {
   strikePrice: string
@@ -32,14 +34,12 @@ const BuyButton = withSuspense(
     const [isLoading, setIsLoading] = useState(false)
 
     async function handleClickBuy() {
-      const strikePriceUint256 = getUint256CalldataFromBN(strikePrice.toString())
       const erc721_id = getUint256CalldataFromBN(nftData.token_id)
-      const premiumUint256 = getUint256CalldataFromBN(premium.toString())
 
       setIsLoading(true)
       const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
-      const existingBalance = uint256.uint256ToBN(balanceResult[0])
+      const existingBalance = uint256.uint256ToBN(balanceResult[0]).divRound(new BN(10).pow(new BN(18)))
       if (existingBalance.ltn(parseInt(premium))) {
         setIsLoading(false)
         createToast({
@@ -55,6 +55,9 @@ const BuyButton = withSuspense(
         transactions.push(constructTransaction(erc721ContractInstance, 'approve', { to: OPTIONS_CONTRACT_ADDRESS, tokenId: erc721_id }))
       }
 
+      const strikePriceUint256 = getUint256CalldataFromBN((new BN(strikePrice)).mul(new BN(10).pow(new BN(18))))
+      const premiumUint256 = getUint256CalldataFromBN((new BN(premium)).mul(new BN(10).pow(new BN(18))))
+
       const paramStruct = {
         b: expiryTimestamp,
         c: nftData.contract_address,
@@ -69,12 +72,11 @@ const BuyButton = withSuspense(
         address,
         OPTIONS_CONTRACT_ADDRESS
       )
-
-      const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0])
+      const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0]).divRound(new BN(10).pow(new BN(18)))
       if (existingMoneyAllowance.ltn(parseInt(premium))) {
         transactions.push(constructTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
           spender: OPTIONS_CONTRACT_ADDRESS,
-          amount: getUint256CalldataFromBN(100000000),
+          amount: getUint256CalldataFromBN(new BN(10000000000000).mul(new BN(10).pow(new BN(18)))),
         }))
       }
 

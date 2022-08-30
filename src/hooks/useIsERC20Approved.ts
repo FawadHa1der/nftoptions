@@ -4,11 +4,12 @@ import useSWR, { KeyedMutator } from 'swr'
 import { callContract } from 'utils/blockchain/starknet'
 
 import useWallet from './useWallet'
+import { BN } from 'bn.js'
 
 async function fetcher(key: string, owner: string) {
   try {
     const allowanceUint256 = await callContract(ERC20_CONTRACT_INSTANCE, 'allowance', owner, OPTIONS_CONTRACT_ADDRESS)
-    const allowance = uint256.uint256ToBN(allowanceUint256.remaining).toNumber()
+    const allowance = uint256.uint256ToBN(allowanceUint256[0]).divRound(new BN(10).pow(new BN(18))).toNumber()
     return allowance > 0
   } catch {
     return false

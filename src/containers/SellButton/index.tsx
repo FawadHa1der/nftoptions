@@ -12,6 +12,7 @@ import getUint256CalldataFromBN from 'utils/getUint256CalldataFromBN'
 import useWallet from 'hooks/useWallet'
 import { Contract, uint256 } from 'starknet'
 import { getStarknet } from 'get-starknet'
+import { BN } from 'bn.js'
 
 type Props = {
   put: PutDataWithNFT
@@ -49,7 +50,7 @@ const SellButton = withSuspense(
         setIsLoading(true)
         const balanceResult = await callContract(ERC20_CONTRACT_INSTANCE, 'balanceOf', address)
 
-        const existingBalance = uint256.uint256ToBN(balanceResult[0])
+        const existingBalance = uint256.uint256ToBN(balanceResult[0]).divRound(new BN(10).pow(new BN(18)))
         if (existingBalance.ltn(parseInt(strike_price.toString()))) {
           setIsLoading(false)
           createToast({
@@ -67,11 +68,11 @@ const SellButton = withSuspense(
           OPTIONS_CONTRACT_ADDRESS
         )
 
-        const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0])
+        const existingMoneyAllowance = uint256.uint256ToBN(allowanceResult[0]).divRound(new BN(10).pow(new BN(18)))
         if (existingMoneyAllowance.ltn(parseInt(strike_price))) {
           transactions.push(constructTransaction(ERC20_CONTRACT_INSTANCE, 'approve', {
             spender: OPTIONS_CONTRACT_ADDRESS,
-            amount: getUint256CalldataFromBN(100000000),
+            amount: getUint256CalldataFromBN(new BN(10000000000000).mul(new BN(10).pow(new BN(18)))),
           }))
         }
 

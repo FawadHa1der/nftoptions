@@ -22,11 +22,11 @@ export async function getAllBidsTest(): Promise<PutData[]> {
 
     mapped_all_bids.push(...all_bids[0].map((option: any) => {
       const data: PutData = {
-        strike_price: uint256.uint256ToBN(option.params.strike_price).toString(10),
+        strike_price: uint256.uint256ToBN(option.params.strike_price).divRound(new BN(10).pow(new BN(18))).toString(10),
         expiry_date: option.params.expiry_date.toString(10),
         erc721_address: option.params.erc721_address.toString(16),
         erc721_id: uint256.uint256ToBN(option.params.erc721_id).toString(10),
-        premium: uint256.uint256ToBN(option.params.premium).toString(10),
+        premium: uint256.uint256ToBN(option.params.premium).divRound(new BN(10).pow(new BN(18))).toString(10),
         buyer_address: option.buyer_address.toString(16),
         seller_address: option.seller_address.toString(16),
         status: option.status.toNumber(),
