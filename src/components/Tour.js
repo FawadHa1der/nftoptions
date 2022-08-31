@@ -46,7 +46,8 @@ const TOUR_STEPS = [
         target: "body",
         content: (
             <div>
-                A little explanatory <a href="https://www.youtube.com/watch?v=r09Ev0P5KEM">video</a>
+                <a href='https://github.com/FawadHa1der/nftoptions'>Source Code</a> <br />
+                Explanatory <a href="https://www.youtube.com/watch?v=r09Ev0P5KEM">video</a>
             </div>
         ),
         placement: "center"
