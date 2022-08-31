@@ -4,12 +4,12 @@ const defaultSEOConfig = {
   title: APP_NAME,
   titleTemplate: "%s",
   defaultTitle: APP_NAME,
-  description: "Flexible Starknet Dapp Template",
+  description: "Lyra NFT put demo on starknet(goerli)",
   canonical: "https://nextarter-chakra.sznm.dev",
   openGraph: {
     url: "https://nextarter-chakra.sznm.dev",
     title: APP_NAME,
-    description: "Flexible Starknet Dapp Template",
+    description: "Lyra NFT put demo on starknet(goerli)",
     images: [
       {
         url: "https://cairopal.xyz/cairopal.png",
